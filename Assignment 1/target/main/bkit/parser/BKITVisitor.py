@@ -9,8 +9,18 @@ else:
 
 class BKITVisitor(ParseTreeVisitor):
 
-    # Visit a parse tree produced by BKITParser#declaration.
-    def visitDeclaration(self, ctx:BKITParser.DeclarationContext):
+    # Visit a parse tree produced by BKITParser#program.
+    def visitProgram(self, ctx:BKITParser.ProgramContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BKITParser#declaration_variable.
+    def visitDeclaration_variable(self, ctx:BKITParser.Declaration_variableContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BKITParser#literal.
+    def visitLiteral(self, ctx:BKITParser.LiteralContext):
         return self.visitChildren(ctx)
 
 

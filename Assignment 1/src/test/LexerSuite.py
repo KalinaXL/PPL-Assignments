@@ -28,4 +28,12 @@ class LexerSuite(unittest.TestCase):
     def test_normal_string_with_escape(self):
         """test normal string with escape"""
         self.assertTrue(TestLexer.checkLexeme(""" "ab'"c\\n def"  ""","""ab'"c\\n def,<EOF>""",107))
-
+    def test_unterminated_comment(self):
+        s ="""
+        ** This is a
+        * multi-line
+        * comment
+        *
+        """
+        TestLexer.checkLexeme(s, "", 108)
+        self.assertTrue(False)

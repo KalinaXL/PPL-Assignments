@@ -15,8 +15,8 @@ class IllegalEscape(LexerError):
         self.message = "Illegal Escape In String: "+ s
 
 class UnterminatedComment(LexerError):
-    def __init__(self):
-        self.message = "Unterminated Comment"
+    def __init__(self, s):
+        self.message = "Unterminated Comment: " + s
 
 
 

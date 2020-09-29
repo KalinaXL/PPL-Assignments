@@ -85,6 +85,8 @@ class TestParser:
             dest.close()
         dest = open("./test/solutions/" + str(num) + ".txt","r")
         line = dest.read()
+        print('EXPECT: ', expect)
+        print('RESULT: ', line)
         return line == expect
 
 

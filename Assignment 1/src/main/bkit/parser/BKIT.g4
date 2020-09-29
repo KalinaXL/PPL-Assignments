@@ -25,7 +25,9 @@ options{
 	language=Python3;
 }
 
-program: (variable_declaration | function_declaration)+;
+program: global_variables_part function_part;
+global_variables_part: variable_declaration*;
+function_part: function_declaration* function_main function_declaration*;
 
 // for expression
 expression: '(' expression ')'
@@ -42,8 +44,8 @@ operands: literal | IDENTIFIER;
 
 // for declaring variables
 variable_declaration  : VAR COLON variable_initializer (COMMA variable_initializer)* SEMI;
-
-variable_name: IDENTIFIER | ARRAY_NAME;
+array_name: IDENTIFIER ('[' INTEGER ']')+;
+variable_name: IDENTIFIER | array_name;
 variable_initializer: variable_name (ASSIGN variable_value)?;
 
 variable_value: expression | array_value_list;
@@ -51,12 +53,14 @@ array_value: variable_value (COMMA variable_value)*;
 array_value_list: '{' array_value '}';
 
 // for declaring functions
-function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list? ENDBODY DOT;
+function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list ENDBODY DOT;
+function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list ENDBODY DOT;
 parameters: PARAMETER COLON parameter_list;
 parameter_list: variable_name (COMMA variable_name)*;
 
+
 // for statements
-statement: variable_declaration* post_statement;
+statement: variable_declaration* post_statement*;
 post_statement: assignment
                 |  if_statement
                 |  for_statement
@@ -66,26 +70,26 @@ post_statement: assignment
                 |  continue_statement
                 |  call_statement
                 |  return_statement;
-statement_list: statement+;
+statement_list: statement;
 
 assignment: IDENTIFIER indices? ASSIGN expression SEMI;
 indices: ('[' expression ']')+;
 
 // if
 if_statement: IF if_start elseif_statement* else_statement? ENDIF DOT;
-if_start: expression THEN statement_list?;
-elseif_statement: ELSEIF expression THEN statement_list?;
-else_statement: ELSE statement_list?;
+if_start: expression THEN statement_list;
+elseif_statement: ELSEIF expression THEN statement_list;
+else_statement: ELSE statement_list;
 
 // for
-for_statement: FOR '(' for_condition ')' DO statement_list? ENDFOR DOT;
-for_condition: IDENTIFIER ASSIGN expression COMMA expressionn COMMA expression;
+for_statement: FOR '(' for_condition ')' DO statement_list ENDFOR DOT;
+for_condition: IDENTIFIER ASSIGN expression COMMA expression COMMA expression;
 
 // while
-while_statement: WHILE expression DO statement_list? ENDWHILE DOT;
+while_statement: WHILE expression statement_list ENDWHILE DOT;
 
 // do-while
-do_while_statement: DO statement_list? WHILE expression ENDDO DOT;\
+do_while_statement: DO statement_list WHILE expression ENDDO DOT;
 
 // break
 break_statement: BREAK SEMI;
@@ -95,7 +99,7 @@ continue_statement: CONTINUE SEMI;
 
 // call
 in_parameters: expression (COMMA expression)*;
-call_statement: IDENTIFIER '(' in_parameters? ')';
+call_statement: IDENTIFIER '(' in_parameters? ')' SEMI;
 
 // return
 return_statement: RETURN expression SEMI;
@@ -127,6 +131,7 @@ THEN: 'Then';
 WHILE: 'While';
 ENDDO: 'EndDo';
 VAR: 'Var' ;
+MAIN: 'main';
 
 // Operators
 ASSIGN: '=';
@@ -154,6 +159,12 @@ GT_F: '>.';
 LTE_F: '<=.';
 GTE_F: '>=.';
 
+// Built-in functions
+// PRINT: 'print';
+// PRINTLN: 'printLn';
+// PRINTSTRLN: 'printStrLn';
+// READ: 'read';
+
 // White spaces
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 
@@ -177,9 +188,6 @@ STRING: '"' CHAR* '"'
 {
     self.text = self.text[1: -1];
 };
-
-// array
-ARRAY_NAME: IDENTIFIER ('[' INTEGER ']')+;
 
 // Error
 ERROR_CHAR: .;

@@ -52,6 +52,11 @@ class NewErrorListener(ConsoleErrorListener):
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         raise SyntaxException("Error on line "+ str(line) + " col " + str(column)+ ": " + offendingSymbol.text)
 NewErrorListener.INSTANCE = NewErrorListener()
+def print_tree(tree, lev):
+    print (" " * lev) + "` " + str(tree)
+    for c in tree.getChildren():
+        print_tree(c, lev + 1)
+
 
 class SyntaxException(Exception):
     def __init__(self,msg):
@@ -74,10 +79,12 @@ class TestParser:
         parser = BKITParser(tokens)
         parser.removeErrorListeners()
         parser.addErrorListener(listener)
+
         try:
             parser.program()
             dest.write("successful")
         except SyntaxException as f:
+            print('Syntex error')
             dest.write(f.message)
         except Exception as e:
             dest.write(str(e))

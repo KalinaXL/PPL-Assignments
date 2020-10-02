@@ -181,7 +181,7 @@ BOOLEAN: ('True' | 'False');
 INTEGER: DEC_INT | OCT_INT | HEX_INT;
 
 // float
-FLOAT: DIGIT+ (DEC_PART EXP_PART | DEC_PART | EXP_PART);
+FLOAT: DEC_INT (DEC_PART EXP_PART | DEC_PART | EXP_PART);
 
 // string
 STRING: '"' CHAR* '"'
@@ -195,9 +195,9 @@ ILLEGAL_ESCAPE: '"' CHAR* ILLEGAL_ESC
 {
     self.text = self.text[1: ];
 };
-UNCLOSE_STRING: '"' CHAR*
+UNCLOSE_STRING: '"' CHAR* ('\n' | EOF)
 {
-    self.text = self.text[1:];
+    self.text = self.text[1: ];
 };
 UNTERMINATED_COMMENT: '**' .*? '*'?;
 
@@ -205,8 +205,8 @@ fragment DIGIT: [0-9];
 fragment OCT_DIGIT: [0-7];
 fragment HEX_DIGIT: [0-9A-F];
 fragment DEC_INT: [1-9] DIGIT* | '0'+;
-fragment HEX_INT: '0' [xX] HEX_DIGIT+;
-fragment OCT_INT: '0' [oO] OCT_DIGIT+;
+fragment HEX_INT: '0' [xX] ( [1-9A-F] HEX_DIGIT* | '0'+ );
+fragment OCT_INT: '0' [oO] ( [1-7] OCT_DIGIT* | '0'+ );
 fragment DEC_PART: '.' DIGIT*;
 fragment EXP_PART: [eE] ('+' | '-')? DIGIT+;
 fragment ILLEGAL_ESC: ('\\' ~[bfrnt'\\] | '\\');

@@ -30,7 +30,7 @@ global_variables_part: variable_declaration*;
 function_part: function_declaration* function_main function_declaration*;
 
 // for expression
-expression: '(' expression ')'
+expression: ORB expression CRB
             | call_statement
             | expression indices
             | (SUBTRACT | SUBTRACT_F) expression
@@ -44,13 +44,13 @@ operands: literal | IDENTIFIER;
 
 // for declaring variables
 variable_declaration  : VAR COLON variable_initializer (COMMA variable_initializer)* SEMI;
-array_name: IDENTIFIER ('[' INTEGER ']')+;
+array_name: IDENTIFIER (OSB INTEGER CSB)+;
 variable_name: IDENTIFIER | array_name;
 variable_initializer: variable_name (ASSIGN variable_value)?;
 
 variable_value: expression | array_value_list;
 array_value: variable_value (COMMA variable_value)*;
-array_value_list: '{' array_value '}';
+array_value_list: OCB array_value CCB;
 
 // for declaring functions
 function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list ENDBODY DOT;
@@ -73,7 +73,7 @@ post_statement: assignment
 statement_list: statement;
 
 assignment: IDENTIFIER indices? ASSIGN expression SEMI;
-indices: ('[' expression ']')+;
+indices: (OSB expression CSB)+;
 
 // if
 if_statement: IF if_start elseif_statement* else_statement? ENDIF DOT;
@@ -82,7 +82,7 @@ elseif_statement: ELSEIF expression THEN statement_list;
 else_statement: ELSE statement_list;
 
 // for
-for_statement: FOR '(' for_condition ')' DO statement_list ENDFOR DOT;
+for_statement: FOR ORB for_condition CRB DO statement_list ENDFOR DOT;
 for_condition: IDENTIFIER ASSIGN expression COMMA expression COMMA expression;
 
 // while
@@ -99,17 +99,24 @@ continue_statement: CONTINUE SEMI;
 
 // call
 in_parameters: expression (COMMA expression)*;
-call_statement: IDENTIFIER '(' in_parameters? ')' SEMI;
+call_statement: IDENTIFIER ORB in_parameters? CRB SEMI;
 
 // return
 return_statement: RETURN expression SEMI;
 
 literal: INTEGER | FLOAT | BOOLEAN | STRING;
 
+// seperators
 SEMI: ';' ;
 COMMA: ',';
 COLON: ':' ;
 DOT: '.';
+OSB: '[';
+CSB: ']';
+ORB: '(';
+CRB: ')';
+OCB: '{';
+CCB: '}';
 
 // Keywords
 BODY: 'Body';

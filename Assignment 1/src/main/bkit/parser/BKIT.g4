@@ -30,17 +30,19 @@ global_variables_part: variable_declaration*;
 function_part: function_declaration* function_main function_declaration*;
 
 // for expression
-expression: ORB expression CRB
-            | call_statement
-            | expression indices
-            | (SUBTRACT | SUBTRACT_F) expression
-            | NOT expression
-            | expression (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) expression
-            | expression (ADD | ADD_F | SUBTRACT | SUBTRACT_F) expression
-            | expression (AND | OR) expression
-            | expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression
+non_array_value: ORB non_array_value CRB
+            | call_function
+            | non_array_value indices
+            | (SUBTRACT | SUBTRACT_F) non_array_value
+            | NOT non_array_value
+            | non_array_value (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) non_array_value
+            | non_array_value (ADD | ADD_F | SUBTRACT | SUBTRACT_F) non_array_value
+            | non_array_value (AND | OR) non_array_value
+            | non_array_value (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression
             | operands;
 operands: literal | IDENTIFIER;
+
+expression: variable_value;
 
 // for declaring variables
 variable_declaration  : VAR COLON variable_initializer (COMMA variable_initializer)* SEMI;
@@ -48,7 +50,7 @@ array_name: IDENTIFIER (OSB INTEGER CSB)+;
 variable_name: IDENTIFIER | array_name;
 variable_initializer: variable_name (ASSIGN variable_value)?;
 
-variable_value: expression | array_value_list;
+variable_value: non_array_value | array_value_list;
 array_value: variable_value (COMMA variable_value)*;
 array_value_list: OCB array_value CCB;
 
@@ -99,7 +101,8 @@ continue_statement: CONTINUE SEMI;
 
 // call
 in_parameters: expression (COMMA expression)*;
-call_statement: IDENTIFIER ORB in_parameters? CRB SEMI;
+call_function: IDENTIFIER ORB in_parameters? CRB;
+call_statement: call_function SEMI;
 
 // return
 return_statement: RETURN expression SEMI;

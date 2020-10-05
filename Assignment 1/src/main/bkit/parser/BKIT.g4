@@ -25,32 +25,33 @@ options{
 	language=Python3;
 }
 
-program: global_variables_part function_part;
-global_variables_part: variable_declaration*;
-function_part: function_declaration* function_main function_declaration*;
+program: (variable_declaration | function_declaration)* function_main (variable_declaration | function_declaration)*;
+//global_variables_part: variable_declaration*;
+//function_part: function_declaration* function_main function_declaration*;
 
 // for expression
-// non_array_value: ORB non_array_value CRB | operands
-//             | call_function
-//             | non_array_value indices
-//             | (SUBTRACT | SUBTRACT_F) non_array_value
-//             | NOT non_array_value
-//             | non_array_value (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) non_array_value
-//             | non_array_value (ADD | ADD_F | SUBTRACT | SUBTRACT_F) non_array_value
-//             | non_array_value (AND | OR) non_array_value
-//             | non_array_value (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression;
+expression: ORB expression CRB
+            | call_function
+            | expression indices
+            | (SUBTRACT | SUBTRACT_F) expression
+            | NOT expression
+            | expression (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) expression
+            | expression (ADD | ADD_F | SUBTRACT | SUBTRACT_F) expression
+            | expression (AND | OR) expression
+            | expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression
+            | operands | array_value_list;
 operands: literal | IDENTIFIER;
 
 // expression: variable_value;
-expression: expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) exp1 | exp1;
-exp1: exp1 (AND | OR) exp2 | exp2;
-exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
-exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
-exp4: exp5 | NOT exp5;
-exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp6;
-exp6: exp7 | exp7 indices;
-exp7: exp8 | call_function;
-exp8: ORB expression CRB | operands | array_value_list;
+// expression: expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) exp1 | exp1;
+// exp1: exp1 (AND | OR) exp2 | exp2;
+// exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
+// exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
+// exp4: exp5 | NOT exp5;
+// exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp6;
+// exp6: exp7 | exp7 indices;
+// exp7: exp8 | call_function;
+// exp8: ORB expression CRB | operands | array_value_list;
 
 // for declaring variables
 variable_declaration  : VAR COLON variable_initializer (COMMA variable_initializer)* SEMI;
@@ -60,11 +61,11 @@ variable_initializer: variable_name (ASSIGN variable_value)?;
 
 variable_value: expression | array_value_list;
 array_value: variable_value (COMMA variable_value)*;
-array_value_list: OCB array_value CCB;
+array_value_list: OCB array_value CCB | OCB CCB;
 
 // for declaring functions
-function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list ENDBODY DOT;
-function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list ENDBODY DOT;
+function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list return_statement statement_list ENDBODY DOT;
+function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list return_statement statement_list ENDBODY DOT;
 parameters: PARAMETER COLON parameter_list;
 parameter_list: variable_name (COMMA variable_name)*;
 
@@ -113,7 +114,7 @@ call_function: IDENTIFIER ORB in_parameters? CRB;
 call_statement: call_function SEMI;
 
 // return
-return_statement: RETURN expression SEMI;
+return_statement: RETURN expression? SEMI;
 
 literal: INTEGER | FLOAT | BOOLEAN | STRING;
 
@@ -223,8 +224,8 @@ fragment DIGIT: [0-9];
 fragment OCT_DIGIT: [0-7];
 fragment HEX_DIGIT: [0-9A-F];
 fragment DEC_INT: [1-9] DIGIT* | '0'+;
-fragment HEX_INT: '0' [xX] ( [1-9A-F] HEX_DIGIT* | '0'+ );
-fragment OCT_INT: '0' [oO] ( [1-7] OCT_DIGIT* | '0'+ );
+fragment HEX_INT: '0' [xX] [1-9A-F] HEX_DIGIT*;
+fragment OCT_INT: '0' [oO] [1-7] OCT_DIGIT*;
 fragment DEC_PART: '.' DIGIT*;
 fragment EXP_PART: [eE] ('+' | '-')? DIGIT+;
 fragment ILLEGAL_ESC: ('\\' ~[bfrnt'\\] | '\\');

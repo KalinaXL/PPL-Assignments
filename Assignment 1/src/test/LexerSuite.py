@@ -42,7 +42,7 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme(input, """Illegal Escape In String: this is a string'"\k""", 108))
     def test_case_10(self):
         input = "0o0423"
-        self.assertTrue(TestLexer.checkLexeme(input, "0o0,423,<EOF>", 109))
+        self.assertTrue(TestLexer.checkLexeme(input, "0,o0423,<EOF>", 109))
     def test_case_11(self):
         input = "Ask"
         self.assertTrue(TestLexer.checkLexeme(input, "Error Token A", 110))
@@ -173,57 +173,60 @@ class LexerSuite(unittest.TestCase):
     def test_case_40(self):
         input = "0xFF0o0843"
         self.assertTrue(TestLexer.checkLexeme(input, "0xFF0,o0843,<EOF>", 139))
-    # def test_case_41(self):
-    #     input = """
-    #     Var: x = 10;
-    #     ** define
-    #     * variable
-    #     *
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10,;,Unterminated Comment", 140))
-    # def test_case_42(self):
-    #     input = """
-    #     Var: x = 10.e2;
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10.e2,;,<EOF>", 141))
-    # def test_case_43(self):
-    #     input = """
-    #     Var: flag = False;
-    #     flag = !flag;
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,flag,=,False,;,flag,=,!,flag,;,<EOF>", 142))
-    # def test_case_44(self):
-    #     input = """
-    #     Var: x = 10.e2;
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10.e2,;,<EOF>", 143))
-    # def test_case_45(self):
-    #     input = """
-    #     Var: x = 'asdaf';
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,Error Token '", 144))
-    # def test_case_46(self):
-    #     input = """
-    #     "\\bkkg\\fh\\tdsf\\n'"fsd'"f\\r\\\gdshg\\'"
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, """\\bkkg\\fh\\tdsf\\n'"fsd'"f\\r\\\gdshg\\',<EOF>""", 145))
-    # def test_case_47(self):
-    #     input = """
-    #     Var: f = -10e+;
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,f,=,-,10,e,+,;,<EOF>", 146))
-    # def test_case_48(self):
-    #     input = """
-    #     x_kaf124kah_ = (1 < 2) && (2. < 3.);
-    #     """
-    #     self.assertTrue(TestLexer.checkLexeme(input, "x_kaf124kah_,=,(,1,<,2,),&&,(,2.,<,3.,),;,<EOF>", 147))
-    # def test_case_49(self):
-    #     input = """Var: variable-@list;"""
-    #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,variable,-,Error Token @", 148))
-    # def test_case_50(self):
-    #     input = """
-    #     s = "dajfsg';"""
-    #     self.assertTrue(TestLexer.checkLexeme(input, "s,=,Unclosed String: dajfsg';", 149))
+    def test_case_41(self):
+        input = """
+        Var: x = 10;
+        ** define
+        * variable
+        *
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10,;,Unterminated Comment", 140))
+    def test_case_42(self):
+        input = """
+        Var: x = 10.e2;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10.e2,;,<EOF>", 141))
+    def test_case_43(self):
+        input = """
+        Var: flag = False;
+        flag = !flag;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,flag,=,False,;,flag,=,!,flag,;,<EOF>", 142))
+    def test_case_44(self):
+        input = """
+        Var: x = 10.e2;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10.e2,;,<EOF>", 143))
+    def test_case_45(self):
+        input = """
+        Var: x = 'asdaf';
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,Error Token '", 144))
+    def test_case_46(self):
+        input = """
+        "\\bkkg\\fh\\tdsf\\n'"fsd'"f\\r\\\gdshg\\'"
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """\\bkkg\\fh\\tdsf\\n'"fsd'"f\\r\\\gdshg\\',<EOF>""", 145))
+    def test_case_47(self):
+        input = """
+        Var: f = -10e+;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,f,=,-,10,e,+,;,<EOF>", 146))
+    def test_case_48(self):
+        input = """
+        x_kaf124kah_ = (1 < 2) && (2. < 3.);
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "x_kaf124kah_,=,(,1,<,2,),&&,(,2.,<,3.,),;,<EOF>", 147))
+    def test_case_49(self):
+        input = """Var: variable-@list;"""
+        self.assertTrue(TestLexer.checkLexeme(input, "Var,:,variable,-,Error Token @", 148))
+    def test_case_50(self):
+        input = """
+        s = "dajfsg;"""
+        self.assertTrue(TestLexer.checkLexeme(input, "s,=,Unclosed String: dajfsg;", 149))
+    def test_case_51(self):
+        input = """ "dahgsfgs\\'fg'" kasdj\\t gi \\bda's" """
+        self.assertTrue(TestLexer.checkLexeme(input, """Illegal Escape In String: dahgsfgs\\'fg'" kasdj\\t gi \\bda'""", 150))
     # def test_case_51(self):
     #     input = """
     #     Var: m, n[10]; 
@@ -238,6 +241,4 @@ class LexerSuite(unittest.TestCase):
     #             EndBody. 
     #     """
     #     self.assertTrue(TestLexer.checkLexeme(input, "Var,:,x,=,10.e2,;,<EOF>", 42))
-    def test_case_42(self):
-        input = """ "DSM" """
-        self.assertTrue(TestLexer.checkLexeme(input, "DSM,<EOF>", 42))
+

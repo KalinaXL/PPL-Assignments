@@ -16,7 +16,7 @@ def emit(self):
     elif tk == self.ERROR_CHAR:
         raise ErrorToken(result.text)
     elif tk == self.UNTERMINATED_COMMENT:
-        raise UnterminatedComment(result.text)
+        raise UnterminatedComment()
     else:
         return result;
 }
@@ -25,9 +25,7 @@ options{
 	language=Python3;
 }
 
-program: (variable_declaration | function_declaration)* function_main (variable_declaration | function_declaration)*;
-//global_variables_part: variable_declaration*;
-//function_part: function_declaration* function_main function_declaration*;
+program: variable_declaration* function_declaration* function_main function_declaration* EOF;
 
 // for expression
 expression: ORB expression CRB
@@ -64,8 +62,8 @@ array_value: variable_value (COMMA variable_value)*;
 array_value_list: OCB array_value CCB | OCB CCB;
 
 // for declaring functions
-function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list return_statement statement_list ENDBODY DOT;
-function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list return_statement statement_list ENDBODY DOT;
+function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list ENDBODY DOT;
+function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list ENDBODY DOT;
 parameters: PARAMETER COLON parameter_list;
 parameter_list: variable_name (COMMA variable_name)*;
 
@@ -228,5 +226,5 @@ fragment HEX_INT: '0' [xX] [1-9A-F] HEX_DIGIT*;
 fragment OCT_INT: '0' [oO] [1-7] OCT_DIGIT*;
 fragment DEC_PART: '.' DIGIT*;
 fragment EXP_PART: [eE] ('+' | '-')? DIGIT+;
-fragment ILLEGAL_ESC: ('\\' ~[bfrnt'\\] | '\\');
-fragment CHAR: ('\'"' | '\\' [btnfr'\\] | ~[\r\n\\"]);
+fragment ILLEGAL_ESC: ('\\' ~[bfrnt'\\] | '\\' | '\'');
+fragment CHAR: ('\'"' | '\\' [btnfr'\\] | ~['\r\n\\"]);

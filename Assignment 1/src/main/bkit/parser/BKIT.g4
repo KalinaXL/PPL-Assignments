@@ -25,31 +25,31 @@ options{
 	language=Python3;
 }
 
-program: variable_declaration* function_declaration* function_main function_declaration* EOF;
+program: variable_declaration* function_declaration* EOF;
 
 // for expression
-expression: ORB expression CRB
-            | call_function
-            | expression indices
-            | (SUBTRACT | SUBTRACT_F) expression
-            | NOT expression
-            | expression (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) expression
-            | expression (ADD | ADD_F | SUBTRACT | SUBTRACT_F) expression
-            | expression (AND | OR) expression
-            | expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression
-            | operands | array_value_list;
+//expression: ORB expression CRB
+//            | call_function
+//            | expression indices
+//            | <assoc = right> (SUBTRACT | SUBTRACT_F) expression
+//            | <assoc = right> NOT expression
+//            | expression (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) expression
+//            | expression (ADD | ADD_F | SUBTRACT | SUBTRACT_F) expression
+//            | expression (AND | OR) expression
+//            | expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression
+//            | operands | array_value_list_assign;
 operands: literal | IDENTIFIER;
 
 // expression: variable_value;
-// expression: expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) exp1 | exp1;
-// exp1: exp1 (AND | OR) exp2 | exp2;
-// exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
-// exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
-// exp4: exp5 | NOT exp5;
-// exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp6;
-// exp6: exp7 | exp7 indices;
-// exp7: exp8 | call_function;
-// exp8: ORB expression CRB | operands | array_value_list;
+ expression: exp1 (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) exp1 | exp1;
+ exp1: exp1 (AND | OR) exp2 | exp2;
+ exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
+ exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
+ exp4: exp5 | NOT exp5;
+ exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp6;
+ exp6: exp7 | exp7 indices;
+ exp7: exp8 | call_function;
+ exp8: ORB expression CRB | operands | array_value_list_assign;
 
 // for declaring variables
 variable_declaration  : VAR COLON variable_initializer (COMMA variable_initializer)* SEMI;
@@ -57,13 +57,17 @@ array_name: IDENTIFIER (OSB INTEGER CSB)+;
 variable_name: IDENTIFIER | array_name;
 variable_initializer: variable_name (ASSIGN variable_value)?;
 
-variable_value: expression | array_value_list;
+variable_value: INTEGER | FLOAT | STRING | array_value_list;
 array_value: variable_value (COMMA variable_value)*;
 array_value_list: OCB array_value CCB | OCB CCB;
 
+variable_value_assign: expression | array_value_list_assign;
+array_value_assign: variable_value_assign (COMMA variable_value_assign)*;
+array_value_list_assign: OCB array_value_assign CCB | OCB CCB;
+
 // for declaring functions
 function_declaration: FUNCTION COLON IDENTIFIER parameters? BODY COLON statement_list ENDBODY DOT;
-function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list ENDBODY DOT;
+// function_main: FUNCTION COLON MAIN parameters? BODY COLON statement_list ENDBODY DOT;
 parameters: PARAMETER COLON parameter_list;
 parameter_list: variable_name (COMMA variable_name)*;
 
@@ -148,7 +152,7 @@ THEN: 'Then';
 WHILE: 'While';
 ENDDO: 'EndDo';
 VAR: 'Var' ;
-MAIN: 'main';
+// MAIN: 'main';
 
 // Operators
 ASSIGN: '=';
@@ -214,7 +218,10 @@ ILLEGAL_ESCAPE: '"' CHAR* ILLEGAL_ESC
 };
 UNCLOSE_STRING: '"' CHAR* ('\n' | EOF)
 {
-    self.text = self.text[1: ];
+    if self.text[-1] == '\n':
+        self.text = self.text[1: -1];
+    else:
+        self.text = self.text[1: ];
 };
 UNTERMINATED_COMMENT: '**' .*? '*'?;
 

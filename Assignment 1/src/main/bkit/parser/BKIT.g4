@@ -25,7 +25,7 @@ options{
 	language=Python3;
 }
 
-program: variable_declaration* function_declaration* EOF;
+program: variable_declaration* function_declaration+ EOF;
 
 // for expression
 //expression: ORB expression CRB
@@ -38,18 +38,27 @@ program: variable_declaration* function_declaration* EOF;
 //            | expression (AND | OR) expression
 //            | expression (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) expression
 //            | operands | array_value_list_assign;
-operands: literal | IDENTIFIER;
+operands: literal_number | IDENTIFIER;
+literal: INTEGER | FLOAT | BOOLEAN | STRING;
+literal_number: INTEGER | FLOAT | BOOLEAN;
+
+exp_str: STRING | ORB exp_str CRB;
 
 // expression: variable_value;
- expression: exp1 (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) exp1 | exp1;
- exp1: exp1 (AND | OR) exp2 | exp2;
- exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
- exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
- exp4: exp5 | NOT exp5;
- exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp6;
- exp6: exp7 | exp7 indices;
- exp7: exp8 | call_function;
- exp8: ORB expression CRB | operands | array_value_list_assign;
+
+expression: exp | exp_str;
+
+exp: exp1 (EQUAL | NOT_EQUAL | LT | GT | LTE | GTE | NOT_EQUAL_F | LT_F | GT_F | LTE_F | GTE_F) exp1 | exp1;
+exp1: exp1 (AND | OR) exp2 | exp2;
+exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
+exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
+exp4: exp5 | NOT exp5;
+exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp6;
+exp6: exp7 | (exp_array | ORB exp_array CRB) indices;
+exp7: exp8 | call_function;
+exp8: ORB exp CRB | operands | array_value_list_assign;
+
+exp_array: IDENTIFIER | call_function;
 
 // for declaring variables
 variable_declaration  : VAR COLON variable_initializer (COMMA variable_initializer)* SEMI;
@@ -99,7 +108,7 @@ for_statement: FOR ORB for_condition CRB DO statement_list ENDFOR DOT;
 for_condition: IDENTIFIER ASSIGN expression COMMA expression COMMA expression;
 
 // while
-while_statement: WHILE expression statement_list ENDWHILE DOT;
+while_statement: WHILE expression DO statement_list ENDWHILE DOT;
 
 // do-while
 do_while_statement: DO statement_list WHILE expression ENDDO DOT;
@@ -117,8 +126,6 @@ call_statement: call_function SEMI;
 
 // return
 return_statement: RETURN expression? SEMI;
-
-literal: INTEGER | FLOAT | BOOLEAN | STRING;
 
 // seperators
 SEMI: ';' ;
@@ -233,5 +240,5 @@ fragment HEX_INT: '0' [xX] [1-9A-F] HEX_DIGIT*;
 fragment OCT_INT: '0' [oO] [1-7] OCT_DIGIT*;
 fragment DEC_PART: '.' DIGIT*;
 fragment EXP_PART: [eE] ('+' | '-')? DIGIT+;
-fragment ILLEGAL_ESC: ('\\' ~[bfrnt'\\] | '\\' | '\'');
+fragment ILLEGAL_ESC: ('\\' ~[bfrnt'\\] | '\\' | '\'' ~["]);
 fragment CHAR: ('\'"' | '\\' [btnfr'\\] | ~['\r\n\\"]);

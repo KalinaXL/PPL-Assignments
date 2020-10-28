@@ -1,0 +1,24 @@
+RESULT: Program([FuncDecl(foo[VarDecl(Id(a),[5]),VarDecl(Id(b))],([VarDecl(Id(i),IntLiteral(0))][While(BinaryOp(<,Id(i),IntLiteral(5)),[],[Assign(ArrayCell(Id(a),[Id(i)]),BinaryOp(+.,Id(b),FloatLiteral(1.0))),Assign(Id(i),BinaryOp(+,Id(i),IntLiteral(1)))])])])
+EXPECT: Program([FuncDecl(foo[VarDecl(Id(a),[5]),VarDecl(Id(b))],([VarDecl(Id(i),IntLiteral(0))][])])
+Tests run  8
+Errors  []
+[(<ASTGenSuite.ASTGenSuite testMethod=test_case_8>,
+  'Traceback (most recent call last):\n'
+  '  File "./test/ASTGenSuite.py", line 74, in test_case_8\n'
+  '    self.assertTrue(TestAST.checkASTGen(input, expect, 306))\n'
+  'AssertionError: False is not true\n')]
+Test output
+ .......F
+======================================================================
+FAIL: test_case_8 (ASTGenSuite.ASTGenSuite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "./test/ASTGenSuite.py", line 74, in test_case_8
+    self.assertTrue(TestAST.checkASTGen(input, expect, 306))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.070s
+
+FAILED (failures=1)
+

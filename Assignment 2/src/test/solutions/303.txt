@@ -1,0 +1,1 @@
+Program([VarDecl(Id(x)),VarDecl(Id(y),IntLiteral(10)),VarDecl(Id(s),StringLiteral(ad\fs)),VarDecl(Id(y),[2,3]),VarDecl(Id(xyasd),IntLiteral(123)),VarDecl(Id(flag),BooleanLiteral(true))])

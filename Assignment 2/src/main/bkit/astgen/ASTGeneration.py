@@ -20,7 +20,7 @@ class ASTGeneration(BKITVisitor):
         if ctx.STRING(): return StringLiteral(ctx.STRING().getText())
         return self.visitArray_value_list(ctx.array_value_list())
     def visitArray_value_list(self, ctx: BKITParser.Array_value_listContext):
-        if ctx.getChildCount() == 0: return ArrayLiteral([])
+        if ctx.getChildCount() == 2: return ArrayLiteral([])
         return ArrayLiteral(ctx.array_value().accept(self))
     def visitVariable_value(self, ctx: BKITParser.Variable_valueContext):
         return ctx.literal().accept(self)
@@ -28,7 +28,7 @@ class ASTGeneration(BKITVisitor):
     def visitArray_value(self, ctx: BKITParser.Array_valueContext):
         return [vv_ctx.accept(self) for vv_ctx in ctx.variable_value()]
     def visitOperands(self, ctx: BKITParser.OperandsContext):
-        if ctx.IDENTIFIER(): return Id(ctx.IDENTIFIER.getText())
+        if ctx.IDENTIFIER(): return Id(ctx.IDENTIFIER().getText())
         return ctx.literal().accept(self)
     def visitExpression(self, ctx: BKITParser.ExpressionContext):
         if ctx.getChildCount() == 1: return ctx.exp1(0).accept(self)
@@ -62,7 +62,7 @@ class ASTGeneration(BKITVisitor):
             lhs = Id(ctx.IDENTIFIER().getText())
         else:
             lhs = Id(ctx.call_function().accept(self))
-        indices = ctx.indices.accept(self)
+        indices = ctx.indices().accept(self)
         return ArrayCell(lhs, indices)
     def visitExp7(self, ctx: BKITParser.Exp7Context):
         if ctx.exp8(): return ctx.exp8().accept(self)
@@ -73,7 +73,7 @@ class ASTGeneration(BKITVisitor):
     def visitIn_parameters(self, ctx: BKITParser.In_parametersContext):
         return [self.visitExpression(exp_ctx) for exp_ctx in ctx.expression()]
     def visitCall_function(self, ctx: BKITParser.Call_functionContext):
-        name = ctx.IDENTIFIER().getText()
+        name = Id(ctx.IDENTIFIER().getText())
         params = ctx.in_parameters().accept(self) if ctx.in_parameters() else []
         return CallExpr(name, params)
     def visitArray_name(self, ctx: BKITParser.Array_nameContext):
@@ -96,7 +96,7 @@ class ASTGeneration(BKITVisitor):
         vrs =  ctx.parameter_list().accept(self)
         return [VarDecl(vr[0], vr[1], None) for vr in vrs]
     def visitFunction_declaration(self, ctx: BKITParser.Function_declarationContext):
-        name = ctx.IDENTIFIER().getName()
+        name = Id(ctx.IDENTIFIER().getText())
         params = ctx.parameters().accept(self) if ctx.parameters() else []
         if ctx.variable_declaration():
             var_decls = [var_decl for vd_ctx in ctx.variable_declaration() for var_decl in vd_ctx.accept(self)]
@@ -196,7 +196,7 @@ class ASTGeneration(BKITVisitor):
         else:
             stmts = []
         exp = ctx.expression().accept(self)
-        return Dowhile(exp, (var_decls, stmts))
+        return Dowhile((var_decls, stmts), exp)
     def visitCall_statement(self, ctx: BKITParser.Call_statementContext):
         fn = ctx.call_function().accept(self)
         return CallStmt(fn.method, fn.param)

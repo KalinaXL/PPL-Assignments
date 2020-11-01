@@ -98,8 +98,45 @@ class ASTGenSuite(unittest.TestCase):
         f = Dowhile(([], [Assign(ArrayCell(Id('a'), [BinaryOp('+', IntLiteral(3), CallExpr(Id('foo'), [IntLiteral(2)]))]), BinaryOp('+', ArrayCell(Id('a'), [ArrayCell(Id('b'), [IntLiteral(2), IntLiteral(3)])]), IntLiteral(4)))]), BinaryOp('==', Id('i'), BooleanLiteral(False)))
         fn = FuncDecl(Id('main'), [], ([], [f]))
         expect =  Program([fn])
-        self.assertTrue(TestAST.checkASTGen(input, expect, 308))
+        self.assertTrue(TestAST.checkASTGen(input, expect, 309))
+    def test_case_11(self):
+        input = """
+        Function: main
+        Parameter: a[10], b
+        Body:
+            Var: i = 0;
+            While x > 0 Do
+                If i == 0 Then
+                    Var: k = 0.;
+                    main(i);
+                EndIf.
+            EndWhile.
 
+        EndBody.
+        """
+        f = While(BinaryOp('>', Id('x'), IntLiteral(0)), ([], [If([(BinaryOp('==', Id('i'), IntLiteral(0)), [VarDecl(Id('k'), [], FloatLiteral(0.))], [CallStmt(Id('main'), [Id('i')])])], ())]))
+        fn = FuncDecl(Id('main'), [VarDecl(Id('a'), [10], None), VarDecl(Id('b'), [], None)], ([VarDecl(Id('i'), [], IntLiteral(0))], [f]))
+        expect =  Program([fn])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 310))
+    def test_case_12(self):
+        input = """
+        Var: a = 5, n[10], s = False;
+        Var: bb[2][3] = {{2, 3, 4}, {4, 5, 6}};
+        Function: main
+        Body:
+            flag = 2;
+            a = !!!!True || dkd;
+            Return fool() + uuuuu(2 + 3, f[2][4]) && dk;
+
+        EndBody.
+        """
+        stmts = [Assign(Id('flag'), IntLiteral(2)), Assign(Id('a'), BinaryOp('||', UnaryOp('!', UnaryOp('!', UnaryOp('!', UnaryOp('!', BooleanLiteral(True))))),Id('dkd'))),\
+                Return(BinaryOp('&&', BinaryOp('+', CallExpr(Id('fool'), []), CallExpr(Id('uuuuu'), [BinaryOp('+', IntLiteral(2), IntLiteral(3)), ArrayCell(Id('f'), [IntLiteral(2), IntLiteral(4)])])), Id('dk')))]
+        fn = FuncDecl(Id('main'), [], ([], stmts))
+        expect =  Program([VarDecl(Id('a'), [], IntLiteral(5)), VarDecl(Id('n'), [10], None), VarDecl(Id('s'), [], BooleanLiteral(False)), \
+        VarDecl(Id('bb'), [2, 3], ArrayLiteral([ArrayLiteral([IntLiteral(2), IntLiteral(3), IntLiteral(4)]), ArrayLiteral([IntLiteral(4), IntLiteral(5), IntLiteral(6)])])), 
+        fn])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 311))
 
  
    

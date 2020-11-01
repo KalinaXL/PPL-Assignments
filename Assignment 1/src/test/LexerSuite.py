@@ -398,176 +398,153 @@ class LexerSuite(unittest.TestCase):
         dasd - asd * 213 (False && true)"____"{bdb, jdas, 1 +. e2, 1. \\. 2e2}
         """
         self.assertTrue(TestLexer.checkLexeme(input, "dasd,-,asd,*,213,(,False,&&,true,),____,{,bdb,,,jdas,,,1,+.,e2,,,1.,\.,2e2,},<EOF>", 179))
-    # def test_1(self):
-    #     inp = """Var: a = 5;"""
-    #     ept = """Var,:,a,=,5,;,<EOF>"""
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 101))
-    # def test_2(self):
-    #     inp = """var a, b;"""
-    #     ept = "var,a,,,b,;,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 102))
-    # def test_3(self):
-    #     inp = """Var a, b;"""
-    #     ept = "Var,a,,,b,;,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 103))
-    # def test_4(self):
-    #     inp = """VAR a, b ,c;"""
-    #     ept = "Error Token V"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 104))
-    # def test_5(self):
-    #     inp = """Var a = 1, b, c, d = {6, 9}"""
-    #     ept = "Var,a,=,1,,,b,,,c,,,d,=,{,6,,,9,},<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 105))
-    # def test_6(self):
-    #     inp = """ "HCMUT" """
-    #     ept = "HCMUT,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 106))
-    # def test_7(self):
-    #     inp = """ "HCM\\nUT" """
-    #     ept = "HCM\\nUT,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 107))
-    # def test_8(self):
-    #     inp = """ "Abc \\b \\f \\r \\n \\t" """
-    #     ept = "Abc \\b \\f \\r \\n \\t,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 108))
-    # def test_9(self):
-    #     inp = """ "Abc '" def" """
-    #     ept = """Abc '" def,<EOF>"""
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 109))
-    # def test_10(self):
-    #     inp = """ "string \\a" """
-    #     ept = "Illegal Escape In String: string \\a"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 110))
-    # def test_11(self):
-    #     inp = """ "string... "" """
-    #     ept = "string... ,Unclosed String:  "
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 111))
-    # def test_12(self):
-    #     inp = """"123"""
-    #     ept = "Unclosed String: 123"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 112))
-    # def test_13(self):
-    #     inp = """**This is a comment**"""
-    #     ept = "<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 113))
-    # def test_14(self):
-    #     inp = """*****"""
-    #     ept = "*,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 114))
-    # def test_15(self):
-    #     inp = """** * **"""
-    #     ept = "<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 115))
-    # def test_16(self):
-    #     inp = """** This is an unterminated comment"""
-    #     ept = "Unterminated Comment"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 116))
-    # def test_17(self):
-    #     inp = """3e8"""
-    #     ept = "3e8,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 117))
-    # def test_18(self):
-    #     inp = """3.14"""
-    #     ept = "3.14,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 118))
-    # def test_19(self):
-    #     inp = """Function: factorial
-    #     Parameter: n
-    #     Body:
-    #         If (N < 2) Then
-    #             Return 1;
-    #         Else
-    #             Return N * factorial(N - 1)
-    #     EndBody.
-    #     """
-    #     ept = "Function,:,factorial,Parameter,:,n,Body,:,If,(,Error Token N"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 119))
-    # def test_20(self):
-    #     inp = """Function: factorial
-    #     Parameter: n
-    #     Body:
-    #         If (n < 2) Then
-    #             Return 1;
-    #         Else
-    #             Return n * factorial(n - 1)
-    #     EndBody.
-    #     """
-    #     ept = "Function,:,factorial,Parameter,:,n,Body,:,If,(,n,<,2,),Then,Return,1,;,Else,Return,n,*,factorial,(,n,-,1,),EndBody,.,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 120))
-    # def test_21(self):
-    #     inp = """a[69 + 1. + 2e5 - 4e2 + foo(2 + a[1])] = 123;"""
-    #     ept = "a,[,69,+,1.,+,2e5,-,4e2,+,foo,(,2,+,a,[,1,],),],=,123,;,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 121))
-    # def test_22(self):
-    #     inp = """ "Computer Science\\'s  '"PPL'" \\b \\n \\f \\r \\t subject" """
-    #     ept = """Computer Science\\'s  '"PPL'" \\b \\n \\f \\r \\t subject,<EOF>"""
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 122))
-    # def test_23(self):
-    #     inp = """ "asd 123 '" :))) """
-    #     ept = """Unclosed String: asd 123 '" :))) """
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 123))
-    # def test_24(self):
-    #     inp = """1. 3.4 4e35 0xFuck 0O0 a_du 0000 001"""
-    #     ept = "1.,3.4,4e35,0xF,uck,0,Error Token O"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 124))
-    # def test_25(self):
-    #     inp = """012.34"""
-    #     ept = "012.34,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 125))
-    # def test_26(self):
-    #     inp = """01234"""
-    #     ept = "0,1234,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 126))
-    # def test_27(self):
-    #     inp = """0X76543210 0XE-5"""
-    #     ept = "0X76543210,0XE,-,5,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 127))
-    # def test_28(self):
-    #     inp = """***
-    #         *How \\f \\n \\z' " ~.~
-    #         *About
-    #         *Multi-line
-    #         *Comment
-    #         ** Function: Main"""
-    #     ept = "Function,:,Error Token M"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 128))
-    # def test_29(self):
-    #     inp = """0000xffff"""
-    #     ept = "0000,xffff,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 129))
-    # def test_30(self):
-    #     inp = """0x0123"""
-    #     ept = "0,x0123,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 130))
-    # def test_31(self):
-    #     inp = """0x_daufuq"""
-    #     ept = "0,x_daufuq,<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 131))
-    # def test_32(self):
-    #     inp = """Body:
-    #     Var: x = -123e+;
-    #     End.
-    #     """
-    #     ept = "Body,:,Var,:,x,=,-,123,e,+,;,Error Token E"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 132))
-    # def test_33(self):
-    #     inp = """(>.<) (*||*) :))"""
-    #     ept = "(,>.,<,),(,*,||,*,),:,),),<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 133))
-    # def test_34(self):
-    #     inp = """foo(3 + 4. \\. 314e-2 + a[2][g(1)])"""
-    #     ept = "foo,(,3,+,4.,\.,314e-2,+,a,[,2,],[,g,(,1,),],),<EOF>"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 134))
-    # def test_35(self):
-    #     inp = """ "'"'"\\'\\f\\b~!@#$%^&*('" """
-    #     ept = """Unclosed String: '"'"\\'\\f\\b~!@#$%^&*('" """
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 135))
-    # def test_36(self):
-    #     inp = """print("hello
-    #     world");"""
-    #     ept = "print,(,Unclosed String: hello"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 101))
-    # def test_case(self):
-    #     inp = """ "abcd'd" """
-    #     ept = "print,(,Unclosed String: hello"
-    #     self.assertTrue(TestLexer.checkLexeme(inp, ept, 101))
+    def test_case_81(self):
+        input = """
+        Function: main
+        'docs'
+        Body:
+        EndBody.
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Function,:,main,Error Token '", 180))
+    def test_case_82(self):
+        input = """
+        Function: main
+        'docs'
+        Body:
+        EndBody.
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Function,:,main,Error Token '", 181))
+    def test_case_83(self):
+        input = """
+       ***iajsfdsg*sjkghsfg***
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "*,<EOF>", 182))
+    def test_case_84(self):
+        input = """
+       ***iajsfdsg*sjkghsfg**
+       "jaja\\'\\'\\'";
+       "'"asdaf'"";
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """jaja\\'\\'\\',;,'"asdaf'",;,<EOF>""", 183))
+    def test_case_85(self):
+        input = """
+        Var: x = "dasd"; {123, 123, **dahg***}[12 "ads"] = 5%6 \.132 -.-.-.;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """Var,:,x,=,dasd,;,{,123,,,123,,,*,},[,12,ads,],=,5,%,6,\.,132,-.,-.,-.,;,<EOF>""", 184))
+    def test_case_86(self):
+        input = """
+        While x = 1: pass.{}[123][f(12, "dasf" +. 123 +. +. *. 123)];
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """While,x,=,1,:,pass,.,{,},[,123,],[,f,(,12,,,dasf,+.,123,+.,+.,*.,123,),],;,<EOF>""", 185))
+    def test_case_87(self):
+        input = """
+        For (i = 0, i < 17, i ** i) Do
+            print(print(i(i)));
+        EndFor.
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """For,(,i,=,0,,,i,<,17,,,i,Unterminated Comment""", 186))
+    def test_case_88(self):
+        input = """
+        Function: dka34
+        x = 31230o0123;
+        Var: x = f((123));
+        EndFor.
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """Function,:,dka34,x,=,31230,o0123,;,Var,:,x,=,f,(,(,123,),),;,EndFor,.,<EOF>""", 187))
+    def test_case_89(self):
+        input = """
+            If (if == 123):
+                x = "dasfgf'" 123\\' \\b\\f \\\\"
+            x = [123];
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """If,(,if,==,123,),:,x,=,dasfgf'" 123\\' \\b\\f \\\\,x,=,[,123,],;,<EOF>""", 188))
+    def test_case_90(self):
+        input = """
+            x = "\\\' \\b\\f \\\\ fshg'%"
+            x = [123];
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,Illegal Escape In String: \\' \\b\\f \\\\ fshg'%""", 189))
+    def test_case_91(self):
+        input = """
+            x = {12, "32"13, &23, 1243, ""};
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,{,12,,,32,13,,,Error Token &""", 190))
+    def test_case_92(self):
+        input = """
+            x = ...--.-.-----.+.++++.;
+            x = *.*.*.*.*. \\.\\.\\.;
+            x = "124{34}" ***324**;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,.,.,.,-,-.,-.,-,-,-,-,-.,+.,+,+,+,+.,;,x,=,*.,*.,*.,*.,*.,\.,\.,\.,;,x,=,124{34},;,<EOF>""", 191))
+    def test_case_93(self):
+        input = """
+            x[True, False, 1 : 10, :newaxis] = {True, False};
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,[,True,,,False,,,1,:,10,,,:,newaxis,],=,{,True,,,False,},;,<EOF>""", 192))
+    def test_case_94(self):
+        input = """
+            x = {blue, b**3***, 2 * 3, 2. *. 43[34] + 13 -. 2}["asd'"'"'"'"];
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,{,blue,,,b,*,,,2,*,3,,,2.,*.,43,[,34,],+,13,-.,2,},[,Unclosed String: asd'"'"'"'"];""", 193))
+    def test_case_95(self):
+        input = """
+            x = 0124 * 41350x012432 + 0x123134 + 123. 4234 && 123.asdsg || (14(f()));
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,0,124,*,41350,x012432,+,0x123134,+,123.,4234,&&,123.,asdsg,||,(,14,(,f,(,),),),;,<EOF>""", 194))
+    def test_case_96(self):
+        input = """
+            x = {     **dasd*** ***1324j***   123    } + 12394X013 + 132;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,{,*,*,123,},+,12394,Error Token X""", 195))
+    def test_case_97(self):
+        input = """
+            x = "das\\t\\b\\'\\t\\n\\r\\r\\nf" + 13.123O12314;"""
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,das\\t\\b\\'\\t\\n\\r\\r\\nf,+,13.123,Error Token O""", 196))
+    def test_case_98(self):
+        input = """
+            x = 123 + 123.adfgg + {123, {{{{"daf"}}}}};
+            x = || 1&& ;
+            x =/= 9 != 10 >. 123 <=. aaa;"""
+        self.assertTrue(TestLexer.checkLexeme(input, """x,=,123,+,123.,adfgg,+,{,123,,,{,{,{,{,daf,},},},},},;,x,=,||,1,&&,;,x,=/=,9,!=,10,>.,123,<=.,aaa,;,<EOF>""", 197))
+    def test_case_99(self):
+        input = """
+            If False Then
+            ElseIf Then
+            Then
+            print("dasd\\\\'"\\1");
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """If,False,Then,ElseIf,Then,Then,print,(,Illegal Escape In String: dasd\\\\'"\\1""", 198))
+    def test_case_100(self):
+        input = """
+            ** this ***
+            blue = th * th -. 1230x423ar235ljfg && 4234 || e13;
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, """*,blue,=,th,*,th,-.,1230,x423ar235ljfg,&&,4234,||,e13,;,<EOF>""", 199))
+    def test_case_101(self):
+        input = """
+        ** **
+        Function: main
+        Body:
+            Var: x = {{{1,  2 ,2e-124, "avc" , -1 }, {  4 , **erty**  5}  },  {{ 6  ,  7  },{ 8,9}}};
+        EndBody.
+        ** **
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Function,:,main,Body,:,Var,:,x,=,{,{,{,1,,,2,,,2e-124,,,avc,,,-,1,},,,{,4,,,5,},},,,{,{,6,,,7,},,,{,8,,,9,},},},;,EndBody,.,<EOF>", 200))
+    def test_case_102(self):
+        input = """
+        x = .123, 03124.4234, 0.+e123, 123.e, 123.123e-1123;
+        123.e+, 1.e13, 1.e-123, 213e
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "x,=,.,123,,,03124.4234,,,0.,+,e123,,,123.,e,,,123.123e-1123,;,123.,e,+,,,1.e13,,,1.e-123,,,213,e,<EOF>", 201))
+    def test_case_103(self):
+        input = """
+        "asdasd
+        jkhgsd"
+        """
+        self.assertTrue(TestLexer.checkLexeme(input, "Unclosed String: asdasd", 202))
+    def test_case_104(self):
+        self.assertTrue(TestLexer.checkLexeme(""" " che6.7ck \\\\\\ d\t \n wow \\ m rek" """, """Illegal Escape In String:  che6.7ck \\\\\\ """, 203))
+    def test_case_105(self):
+        self.assertTrue(TestLexer.checkLexeme("0000.0 03123 000 312.000e1123 3123e140000", """0000.0,0,3123,0,0,0,312.000e1123,3123e140000,<EOF>""", 204))
+    
+

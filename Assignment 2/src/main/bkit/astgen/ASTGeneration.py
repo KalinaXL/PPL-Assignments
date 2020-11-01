@@ -18,7 +18,7 @@ class ASTGeneration(BKITVisitor):
         if ctx.FLOAT(): return FloatLiteral(float(ctx.FLOAT().getText()))
         if ctx.BOOLEAN(): return BooleanLiteral(eval(ctx.BOOLEAN().getText()))
         if ctx.STRING(): return StringLiteral(ctx.STRING().getText())
-        return self.visitArray_value_list(ctx.array_value_list())
+        return ctx.array_value_list().accept(self)
     def visitArray_value_list(self, ctx: BKITParser.Array_value_listContext):
         if ctx.getChildCount() == 2: return ArrayLiteral([])
         return ArrayLiteral(ctx.array_value().accept(self))
@@ -71,7 +71,7 @@ class ASTGeneration(BKITVisitor):
         if ctx.getChildCount() == 1: return ctx.operands().accept(self)
         return ctx.expression().accept(self)
     def visitIn_parameters(self, ctx: BKITParser.In_parametersContext):
-        return [self.visitExpression(exp_ctx) for exp_ctx in ctx.expression()]
+        return [exp_ctx.accept(self) for exp_ctx in ctx.expression()]
     def visitCall_function(self, ctx: BKITParser.Call_functionContext):
         name = Id(ctx.IDENTIFIER().getText())
         params = ctx.in_parameters().accept(self) if ctx.in_parameters() else []

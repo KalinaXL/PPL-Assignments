@@ -137,6 +137,177 @@ class ASTGenSuite(unittest.TestCase):
         VarDecl(Id('bb'), [2, 3], ArrayLiteral([ArrayLiteral([IntLiteral(2), IntLiteral(3), IntLiteral(4)]), ArrayLiteral([IntLiteral(4), IntLiteral(5), IntLiteral(6)])])), 
         fn])
         self.assertTrue(TestAST.checkASTGen(input, expect, 311))
+    def test_case_13(self):
+        input = """
+        Var: s = "daofjsdg";
+        Function: main
+        Body:
+            Var: arr[26];
+            f = fact(n) % 0O10;
+            While (i < length(s)) Do
+                arr[lower(s[i]) - 97] =  arr[lower(s[i]) - 97] +. 1.e0;
+            EndWhile.
+            max_length = max(arr);
+        EndBody.
+        Function: sum
+        Parameter: n
+        Body:
+            p = 1.;
+            For (i = 1, i < n, 1) Do
+                p = p *. i;
+            EndFor.
+            Return i;
+        EndBody.
+        """
+        f1 = FuncDecl(Id('main'), [], ([VarDecl(Id('arr'), [26], None)], [Assign(Id('f'), BinaryOp('%', CallExpr(Id('fact'), [Id('n')]), IntLiteral(0o10))), \
+            While(BinaryOp('<', Id('i'), CallExpr(Id('length'), [Id('s')])), ([], [Assign(ArrayCell(Id('arr'), [BinaryOp('-', CallExpr(Id('lower'), [ArrayCell(Id('s'), [Id('i')])]), IntLiteral(97))]), BinaryOp('+.', ArrayCell(Id('arr'), [BinaryOp('-', CallExpr(Id('lower'), [ArrayCell(Id('s'), [Id('i')])]), IntLiteral(97))]), FloatLiteral(1.0)))])),\
+                Assign(Id('max_length'), CallExpr(Id('max'), [Id('arr')]))]))
+        f2 = FuncDecl(Id('sum'), [VarDecl(Id('n'), [], None)], ([], [Assign(Id('p'), FloatLiteral(1.)), For(Id('i'), IntLiteral(1), BinaryOp('<', Id('i'), Id('n')), IntLiteral(1), ([], [Assign(Id('p'), BinaryOp('*.', Id('p'), Id('i')))])), Return(Id('i'))]))
+        expect =  Program([VarDecl(Id('s'), [], StringLiteral("daofjsdg")), f1, f2])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 312))
+    def test_case_14(self):
+        input = """
+        Var: s = "daofjsdg";
+        Function: main
+        Body:
+            Var: arr[26];
+            f = fact(n) % 0O10;
+            While (i < length(s)) Do
+                arr[lower(s[i]) - 97] =  arr[lower(s[i]) - 97] +. 1.e0;
+            EndWhile.
+            max_length = max(arr);
+        EndBody.
+        Function: sum
+        Parameter: n
+        Body:
+            p = 1.;
+            For (i = 1, i < n, 1) Do
+                p = p *. i;
+            EndFor.
+            Return i;
+        EndBody.
+        """
+        f1 = FuncDecl(Id('main'), [], ([VarDecl(Id('arr'), [26], None)], [Assign(Id('f'), BinaryOp('%', CallExpr(Id('fact'), [Id('n')]), IntLiteral(0o10))), \
+            While(BinaryOp('<', Id('i'), CallExpr(Id('length'), [Id('s')])), ([], [Assign(ArrayCell(Id('arr'), [BinaryOp('-', CallExpr(Id('lower'), [ArrayCell(Id('s'), [Id('i')])]), IntLiteral(97))]), BinaryOp('+.', ArrayCell(Id('arr'), [BinaryOp('-', CallExpr(Id('lower'), [ArrayCell(Id('s'), [Id('i')])]), IntLiteral(97))]), FloatLiteral(1.0)))])),\
+                Assign(Id('max_length'), CallExpr(Id('max'), [Id('arr')]))]))
+        f2 = FuncDecl(Id('sum'), [VarDecl(Id('n'), [], None)], ([], [Assign(Id('p'), FloatLiteral(1.)), For(Id('i'), IntLiteral(1), BinaryOp('<', Id('i'), Id('n')), IntLiteral(1), ([], [Assign(Id('p'), BinaryOp('*.', Id('p'), Id('i')))])), Return(Id('i'))]))
+        expect =  Program([VarDecl(Id('s'), [], StringLiteral("daofjsdg")), f1, f2])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 313))
+    def test_case_15(self):
+        input = """
+        Function: main
+        Body:
+            Var: x = 0x213ACF, s = 123e-3;
+            v = 4 \. (3 *. 314e-2) * r * r * r;
+            If x < 10 Then
+                Break;
+            Else
+                x = x && d >. 1;
+            EndIf.
+        EndBody.
+        """
+        expect =  Program([FuncDecl(Id('main'), [], ([VarDecl(Id('x'), [], IntLiteral(0x213ACF)), VarDecl(Id('s'), [], FloatLiteral(123e-3))], \
+            [Assign(Id('v'), BinaryOp('*', BinaryOp('*', BinaryOp('*', BinaryOp('\\.', IntLiteral(4), BinaryOp('*.', IntLiteral(3), FloatLiteral(314e-2))), Id('r')),Id('r')), Id('r'))), \
+                If([(BinaryOp('<', Id('x'), IntLiteral(10)), [], [Break()])], ([], [Assign(Id('x'), BinaryOp('>.', BinaryOp('&&', Id('x'), Id('d')), IntLiteral(1)))]))]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 314))
+    def test_case_16(self):
+        input = """
+        Function: main
+        Body:
+            Do
+                Var: k = 12;
+                k = -.-k;
+                a[2][3 + 3] = foo(2 + k, k, arr[0]);
+                m = a[1][2 + f[2]];
+            While x == 0 EndDo.
+        EndBody.
+        """
+        expect =  Program([FuncDecl(Id('main'), [], ([], [Dowhile(([VarDecl(Id('k'), [], IntLiteral(12))], [Assign(Id('k'), UnaryOp('-.', UnaryOp('-', Id('k')))), \
+            Assign(ArrayCell(Id('a'), [IntLiteral(2), BinaryOp('+', IntLiteral(3), IntLiteral(3))]), \
+            CallExpr(Id('foo'), [BinaryOp('+', IntLiteral(2), Id('k')), Id('k'), ArrayCell(Id('arr'), [IntLiteral(0)])])), \
+            Assign(Id('m'), ArrayCell(Id('a'), [IntLiteral(1), BinaryOp('+', IntLiteral(2), ArrayCell(Id('f'), [IntLiteral(2)]))]))]), BinaryOp('==', Id('x'), IntLiteral(0)))]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 315))
+    def test_case_17(self):
+        input = """
+        Var: m, n[10]; 
+        Function: main 
+        Parameter: n 
+        Body: 
+            x = {{{1,2}, {3,4}}, {5,6}};
+            If n == 0 Then 
+                Return 1; 
+            Else
+                Return n * face({1,2});
+            EndIf.
+        EndBody. 
+        """
+        expect =  Program([VarDecl(Id('m'), [], None), VarDecl(Id('n'), [10], None), FuncDecl(Id('main'), [VarDecl(Id('n'), [], None)], ([], [\
+            Assign(Id('x'), ArrayLiteral([ArrayLiteral([ArrayLiteral([IntLiteral(1), IntLiteral(2)]), ArrayLiteral([IntLiteral(3), IntLiteral(4)])]), ArrayLiteral([IntLiteral(5), IntLiteral(6)])])),\
+            If([(BinaryOp('==', Id('n'), IntLiteral(0)), [], [Return(IntLiteral(1))])], ([], [Return(BinaryOp('*', Id('n'), CallExpr(Id('face'), [ArrayLiteral([IntLiteral(1), IntLiteral(2)])])))]))]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 316))
+    def test_case_18(self):
+        input = """
+        Var: a, b, c = 10e12;
+        Function: main
+        Body:
+            Var: i = 0, arr[10];
+            c = arr[0];
+            For (i = 1, i < 10, 1) Do
+                If (c < arr[i]) Then
+                    c = arr[i];
+                EndIf.
+            EndFor.  
+            f(1, 2, 3);
+            Return;
+        EndBody.
+        """
+        expect =  Program([VarDecl(Id('a'), [], None), VarDecl(Id('b'), [], None), VarDecl(Id('c'), [], FloatLiteral(10e12)), FuncDecl(Id('main'), [], ([VarDecl(Id('i'), [], IntLiteral(0)), VarDecl(Id('arr'), [10], None)], [\
+                Assign(Id('c'), ArrayCell(Id('arr'), [IntLiteral(0)])),\
+                For(Id('i'), IntLiteral(1), BinaryOp('<', Id('i'), IntLiteral(10)), IntLiteral(1), ([], [If([(BinaryOp('<', Id('c'), ArrayCell(Id('arr'), [Id('i')])), [], [Assign(Id('c'), ArrayCell(Id('arr'), [Id('i')]))])], ())])),\
+                CallStmt(Id('f'), [IntLiteral(1), IntLiteral(2), IntLiteral(3)]), Return(None)]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 317))
+    def test_case_19(self):
+        input = """
+        Function: sort
+        Parameter: arr[0o100], left, right
+        Body:
+            For(i = left + 1, i <= right, 1) Do
+                Var: temp, j;
+                temp = arr[i];
+                j = i - 1;
+                While (j >= left) && (arr[j] > temp) Do
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                EndWhile.
+                arr[j + 1] = temp;
+            EndFor.
+        EndBody.
+        """
+        expect =  Program([FuncDecl(Id('sort'), [VarDecl(Id('arr'), [0o100], None), VarDecl(Id('left'), [], None), VarDecl(Id('right'), [], None)], ([], [\
+                For(Id('i'), BinaryOp('+', Id('left'), IntLiteral(1)), BinaryOp('<=', Id('i'), Id('right')), IntLiteral(1), ([VarDecl(Id('temp'), [], None), VarDecl(Id('j'), [], None)], \
+                [Assign(Id('temp'), ArrayCell(Id('arr'), [Id('i')])), Assign(Id('j'), BinaryOp('-', Id('i'), IntLiteral(1))),\
+                While(BinaryOp('&&', BinaryOp('>=', Id('j'), Id('left')), BinaryOp('>', ArrayCell(Id('arr'), [Id('j')]), Id('temp'))),([], [Assign(ArrayCell(Id('arr'), [BinaryOp('+', Id('j'), IntLiteral(1))]), ArrayCell(Id('arr'), [Id('j')])), Assign(Id('j'), BinaryOp('-', Id('j'), IntLiteral(1)))])),\
+                Assign(ArrayCell(Id('arr'), [BinaryOp('+', Id('j'), IntLiteral(1))]), Id('temp'))
+                ]))]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 318))
+    def test_case_20(self):
+        input = """
+        Function: convert
+        Parameter: str
+        Body:
+            Var: arr[100];
+            Var: length;
+            length = length(str) - 1;
+            Return length;
+        EndBody.
+        Function: main
+        Body:
+            convert();
+        EndBody.
+        """
+        f1 = FuncDecl(Id('convert'), [VarDecl(Id('str'), [], None)], ([VarDecl(Id('arr'), [100], None), VarDecl(Id('length'), [], None)], [Assign(Id('length'), BinaryOp('-', CallExpr(Id('length'), [Id('str')]), IntLiteral(1))), Return(Id('length'))]))
+        f2 = FuncDecl(Id('main'), [], ([], [CallStmt(Id('convert'), [])]))
+        expect =  Program([f1, f2])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 319))
 
- 
    

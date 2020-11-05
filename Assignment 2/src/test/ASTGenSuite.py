@@ -309,5 +309,79 @@ class ASTGenSuite(unittest.TestCase):
         f2 = FuncDecl(Id('main'), [], ([], [CallStmt(Id('convert'), [])]))
         expect =  Program([f1, f2])
         self.assertTrue(TestAST.checkASTGen(input, expect, 319))
-
+    def test_case_21(self):
+        input = """
+        Function: main
+        Body:
+            a = f(2, 3 + 4)[1 + 2];
+        EndBody.
+        """
+        f = FuncDecl(Id('main'), [], ([], [Assign(Id('a'), ArrayCell(CallExpr(Id('f'), [IntLiteral(2), BinaryOp('+', IntLiteral(3), IntLiteral(4))]), [BinaryOp('+', IntLiteral(1), IntLiteral(2))]))]))
+        expect =  Program([f])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 320))
+    def test_case_22(self):
+        input = """
+        Function: fact
+        Parameter: x, a[2]
+        Body:
+            For (i = 0, i < 10, 2) Do
+                If (x) Then Break; EndIf.
+            EndFor.
+            If (x) Then Break; EndIf.
+        EndBody.
+        """
+        if_stmt = If([(Id('x'), [], [Break()])], ())
+        f = FuncDecl(Id('fact'), [VarDecl(Id('x'), [], None), VarDecl(Id('a'), [2], None)], ([], [For(Id('i'), IntLiteral(0), BinaryOp('<', Id('i'), IntLiteral(10)), IntLiteral(2), ([], [if_stmt])), if_stmt]))
+        expect =  Program([f])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 321))
+    def test_case_23(self):
+        input = """
+        Function: main
+        Body:
+            Var: x = 10;
+            kk = 0o10 && 0x123 || 12.3 + True;
+            f(1 + 2, a)[2 + a[2]] = a[0][2 + 2][f()]; 
+            While x < cond() Do
+                print("string, hala madrid");
+            EndWhile.
+        EndBody.
+        """
+        f = FuncDecl(Id('main'), [], ([VarDecl(Id('x'), [], IntLiteral(10))], [Assign(Id('kk'), BinaryOp('||', BinaryOp('&&', IntLiteral(0o10), IntLiteral(0x123)), BinaryOp('+', FloatLiteral(12.3), BooleanLiteral(True)))), \
+                                        Assign(ArrayCell(CallExpr(Id('f'), [BinaryOp('+', IntLiteral(1), IntLiteral(2)), Id('a')]), [BinaryOp('+', IntLiteral(2), ArrayCell(Id('a'), [IntLiteral(2)]))]), ArrayCell(Id('a'), [IntLiteral(0), BinaryOp('+', IntLiteral(2), IntLiteral(2)), CallExpr(Id('f'), [])])),\
+                                        While(BinaryOp('<', Id('x'), CallExpr(Id('cond'), [])), ([], [CallStmt(Id('print'), [StringLiteral("string, hala madrid")])]))
+                                        ]))
+        expect = Program([f])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 322))
+    def test_case_24(self):
+        input = """
+        Function: main
+        Body:
+            Do
+                f_n_f(12);
+                While x Do
+                    Var: x;
+                    If x == 1 Then
+                        Var: x;
+                    EndIf.
+                EndWhile.
+            While True EndDo.
+        EndBody.
+        """
+        dowhile = Dowhile(([], [CallStmt(Id('f_n_f'), [IntLiteral(12)]), While(Id('x'), ([VarDecl(Id('x'), [], None)], [If([(BinaryOp('==', Id('x'), IntLiteral(1)), [VarDecl(Id('x'), [], None)], [])], ())]))]), BooleanLiteral(True))
+        f = FuncDecl(Id('main'), [], ([], [dowhile]))
+        expect = Program([f])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 323))
+    def test_case_25(self):
+        input = """
+        Function: main
+        Body:
+            For(i = init(), i < bound(), step()) Do
+                a = in(f(in(2, f())))[f()];
+            EndFor.
+        EndBody.
+        """
+        f = FuncDecl(Id('main'), [], ([], [For(Id('i'), CallExpr(Id('init'), []), BinaryOp('<', Id('i'), CallExpr(Id('bound'), [])), CallExpr(Id('step'), []), ([],\
+             [Assign(Id('a'), ArrayCell(CallExpr(Id('in'), [CallExpr(Id('f'), [CallExpr(Id('in'), [IntLiteral(2), CallExpr(Id('f'), [])])])]), [CallExpr(Id('f'), [])]))]))]))
+        expect = Program([f])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 323))
    

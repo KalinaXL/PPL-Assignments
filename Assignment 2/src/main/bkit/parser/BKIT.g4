@@ -63,7 +63,6 @@ parameter_list: variable_name (COMMA variable_name)*;
 
 
 // for statements
-statement: variable_declaration* post_statement*;
 post_statement: assignment
                 |  if_statement
                 |  for_statement
@@ -73,9 +72,8 @@ post_statement: assignment
                 |  continue_statement
                 |  call_statement
                 |  return_statement;
-statement_list: statement;
 
-assignment: IDENTIFIER indices? ASSIGN expression SEMI;
+assignment: (IDENTIFIER | call_function) indices? ASSIGN expression SEMI;
 indices: (OSB expression CSB)+;
 
 // if

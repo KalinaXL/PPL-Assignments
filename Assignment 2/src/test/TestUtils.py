@@ -36,9 +36,6 @@ class TestLexer:
             dest.close() 
         dest = open("./test/solutions/" + str(num) + ".txt","r")
         line = dest.read()
-        if line != expect:
-            print('RESULT:', line)
-            print('EXPECT:', expect)
         return line == expect
 
     @staticmethod    
@@ -104,6 +101,8 @@ class TestAST:
         dest = open("./test/solutions/" + str(num) + ".txt","r")
         line = dest.read()
         if line != str(expect):
+            with open('result.txt', 'w') as f:
+                f.write(line)
             print('RESULT:', line)
             print('EXPECT:', str(expect))
         return line == str(expect)

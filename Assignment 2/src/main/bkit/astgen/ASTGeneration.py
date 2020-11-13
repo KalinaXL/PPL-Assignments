@@ -58,10 +58,7 @@ class ASTGeneration(BKITVisitor):
         return UnaryOp(ctx.getChild(0).getText(), ctx.exp5().accept(self))
     def visitExp6(self, ctx: BKITParser.Exp6Context):
         if ctx.getChildCount() == 1: return ctx.exp7().accept(self)
-        if ctx.IDENTIFIER():
-            lhs = Id(ctx.IDENTIFIER().getText())
-        else:
-            lhs = ctx.call_function().accept(self)
+        lhs = ctx.exp7().accept(self)
         indices = ctx.indices().accept(self)
         return ArrayCell(lhs, indices)
     def visitExp7(self, ctx: BKITParser.Exp7Context):
@@ -111,12 +108,13 @@ class ASTGeneration(BKITVisitor):
     def visitIndices(self, ctx: BKITParser.IndicesContext):
         return [exp_ctx.accept(self) for exp_ctx in ctx.expression()]
     def visitAssignment(self, ctx: BKITParser.AssignmentContext):
-        if ctx.IDENTIFIER(): lhs = Id(ctx.IDENTIFIER().getText())
-        elif ctx.call_function(): lhs = ctx.call_function().accept(self)
-        if ctx.indices():
-            indices = ctx.indices().accept(self)
-            lhs = ArrayCell(lhs, indices)
-        value = ctx.expression().accept(self)
+        # if ctx.IDENTIFIER(): lhs = Id(ctx.IDENTIFIER().getText())
+        # elif ctx.call_function(): lhs = ctx.call_function().accept(self)
+        # if ctx.indices():
+        #     indices = ctx.indices().accept(self)
+        #     lhs = ArrayCell(lhs, indices)
+        lhs = ctx.expression(0).accept(self)
+        value = ctx.expression(1).accept(self)
         return Assign(lhs, value)
 
     def visitIf_start(self, ctx: BKITParser.If_startContext):

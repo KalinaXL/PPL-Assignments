@@ -40,7 +40,7 @@ exp2: exp2 (ADD | ADD_F | SUBTRACT | SUBTRACT_F) exp3 | exp3;
 exp3: exp3 (MULTIPLY | MULTIPLY_F | DIVIDE | DIVIDE_F | MODULO) exp4 | exp4;
 exp4: exp5 | NOT exp4;
 exp5: exp6 | (SUBTRACT | SUBTRACT_F) exp5;
-exp6: exp7 | (IDENTIFIER | call_function) indices;
+exp6: exp7 | exp7 indices;
 exp7: exp8 | call_function;
 exp8: ORB expression CRB | operands;
 
@@ -73,7 +73,7 @@ post_statement: assignment
                 |  call_statement
                 |  return_statement;
 
-assignment: (IDENTIFIER | call_function) indices? ASSIGN expression SEMI;
+assignment: expression ASSIGN expression SEMI;
 indices: (OSB expression CSB)+;
 
 // if

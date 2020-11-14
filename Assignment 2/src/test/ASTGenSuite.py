@@ -1384,10 +1384,11 @@ class ASTGenSuite(unittest.TestCase):
         Function: m
         Body:
             f = (a + f(2 + 3, f + 2) * (f)[f((f[0]))[t]])[123] - 123;
-            5=123;
+            a[2 + f()] = f(f * k(a[0]));
+            f()[2 + f()[2]] = "dasf" + f(2, 3 - f[2])[2];
             Continue;
         EndBody."""
-        expect = Program([FuncDecl(Id('m'), [],([],[Assign(Id('f'),BinaryOp('-',ArrayCell(BinaryOp('+',Id('a'),BinaryOp('*',CallExpr(Id('f'),[BinaryOp('+',IntLiteral(2),IntLiteral(3)),BinaryOp('+',Id('f'),IntLiteral(2))]),ArrayCell(Id('f'),[ArrayCell(CallExpr(Id('f'),[ArrayCell(Id('f'),[IntLiteral(0)])]),[Id('t')])]))),[IntLiteral(123)]),IntLiteral(123))),Assign(IntLiteral(5),IntLiteral(123)),Continue()]))])
+        expect = Program([FuncDecl(Id('m'), [],([],[Assign(Id('f'),BinaryOp('-',ArrayCell(BinaryOp('+',Id('a'),BinaryOp('*',CallExpr(Id('f'),[BinaryOp('+',IntLiteral(2),IntLiteral(3)),BinaryOp('+',Id('f'),IntLiteral(2))]),ArrayCell(Id('f'),[ArrayCell(CallExpr(Id('f'),[ArrayCell(Id('f'),[IntLiteral(0)])]),[Id('t')])]))),[IntLiteral(123)]),IntLiteral(123))),Assign(ArrayCell(Id('a'),[BinaryOp('+',IntLiteral(2),CallExpr(Id('f'),[]))]),CallExpr(Id('f'),[BinaryOp('*',Id('f'),CallExpr(Id('k'),[ArrayCell(Id('a'),[IntLiteral(0)])]))])),Assign(ArrayCell(CallExpr(Id('f'),[]),[BinaryOp('+',IntLiteral(2),ArrayCell(CallExpr(Id('f'),[]),[IntLiteral(2)]))]),BinaryOp('+',StringLiteral("""dasf"""),ArrayCell(CallExpr(Id('f'),[IntLiteral(2),BinaryOp('-',IntLiteral(3),ArrayCell(Id('f'),[IntLiteral(2)]))]),[IntLiteral(2)]))),Continue()]))])
         self.assertTrue(TestAST.checkASTGen(input,expect,391))
     def test_case_93(self):
         input = """

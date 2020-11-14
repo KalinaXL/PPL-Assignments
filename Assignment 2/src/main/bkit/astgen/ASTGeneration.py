@@ -108,13 +108,16 @@ class ASTGeneration(BKITVisitor):
     def visitIndices(self, ctx: BKITParser.IndicesContext):
         return [exp_ctx.accept(self) for exp_ctx in ctx.expression()]
     def visitAssignment(self, ctx: BKITParser.AssignmentContext):
-        # if ctx.IDENTIFIER(): lhs = Id(ctx.IDENTIFIER().getText())
-        # elif ctx.call_function(): lhs = ctx.call_function().accept(self)
-        # if ctx.indices():
-        #     indices = ctx.indices().accept(self)
-        #     lhs = ArrayCell(lhs, indices)
-        lhs = ctx.expression(0).accept(self)
-        value = ctx.expression(1).accept(self)
+        if ctx.IDENTIFIER(): 
+            lhs = Id(ctx.IDENTIFIER().getText())
+            if ctx.indices():
+                indices = ctx.indices().accept(self)
+                lhs = ArrayCell(lhs, indices)
+        elif ctx.call_function(): 
+            lhs = ctx.call_function().accept(self)
+            indices = ctx.indices().accept(self)
+            lhs = ArrayCell(lhs, indices)
+        value = ctx.expression().accept(self)
         return Assign(lhs, value)
 
     def visitIf_start(self, ctx: BKITParser.If_startContext):

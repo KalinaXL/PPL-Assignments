@@ -157,7 +157,7 @@ class ASTGeneration(BKITVisitor):
         if ctx.elseif_statement():
             for ef_ctx in ctx.elseif_statement():
                 if_tup.append(ef_ctx.accept(self))
-        else_tup = ctx.else_statement().accept(self) if ctx.else_statement() else []
+        else_tup = ctx.else_statement().accept(self) if ctx.else_statement() else ([], [])
         return If(if_tup, else_tup)
     
     def visitFor_condition(self, ctx: BKITParser.For_conditionContext):

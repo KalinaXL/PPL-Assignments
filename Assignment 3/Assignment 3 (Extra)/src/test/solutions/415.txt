@@ -1,1 +1,1 @@
-str(TypeMismatchInStatement(CallStmt(Id('foo'),[])))
+str(UnreachableStatement(Assign(Id('x'),Id('y'))))

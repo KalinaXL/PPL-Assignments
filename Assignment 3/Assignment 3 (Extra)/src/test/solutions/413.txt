@@ -1,1 +1,1 @@
-str(UnreachableFunction('foo'))
+str(TypeMismatchInStatement(Assign(Id('k'),Id('x'))))

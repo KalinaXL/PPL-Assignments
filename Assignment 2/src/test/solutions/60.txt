@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[VarDecl(Id(x))],([VarDecl(Id(x)),VarDecl(Id(y)),VarDecl(Id(z))][If(BinaryOp(>,Id(x),IntLiteral(10)),[],[CallStmt(Id(print),[StringLiteral(x>10)])])ElseIf(BinaryOp(>,Id(y),IntLiteral(10)),[],[CallStmt(Id(print),[StringLiteral(y>10 & x<10)])])Else([],[]),Assign(ArrayCell(CallExpr(Id(foo),[]),[Id(z)]),Id(y))]))])

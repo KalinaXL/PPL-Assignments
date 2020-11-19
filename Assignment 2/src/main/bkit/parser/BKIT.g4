@@ -73,7 +73,7 @@ post_statement: assignment
                 |  call_statement
                 |  return_statement;
 
-assignment: ((IDENTIFIER indices?) | (call_function indices)) ASSIGN expression SEMI;
+assignment: (IDENTIFIER | (expression indices)) ASSIGN expression SEMI;
 
 indices: (OSB expression CSB)+;
 

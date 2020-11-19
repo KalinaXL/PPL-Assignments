@@ -1507,6 +1507,75 @@ class ASTGenSuite(unittest.TestCase):
         EndBody."""
         expect = Program([VarDecl(Id('a'), [], None),VarDecl(Id('b'), [],IntLiteral(120)),VarDecl(Id('c'), [],StringLiteral("""123""")),VarDecl(Id('d'), [10],ArrayLiteral([IntLiteral(1),IntLiteral(2),IntLiteral(5)])),VarDecl(Id('f'), [],ArrayLiteral([IntLiteral(12),IntLiteral(3),IntLiteral(4),ArrayLiteral([ArrayLiteral([])])])),FuncDecl(Id('test_'), [VarDecl(Id('flag'), [], None)],([],[If([(BinaryOp('&&',ArrayCell(Id('flag'),[IntLiteral(0)]),IntLiteral(1)),[],[For(Id('i'),IntLiteral(0),BinaryOp('<',Id('i'),CallExpr(Id('upp'),[CallExpr(Id('upp'),[Id('i')])])),CallExpr(Id('s'),[]), ([],[CallStmt(Id('update'),[Id('f'),Id('i'),ArrayCell(Id('d'),[Id('i')])])]))]),(BinaryOp('&&',ArrayCell(Id('flag'),[IntLiteral(2)]),IntLiteral(2)),[],[Return(None)]),(CallExpr(Id('all'),[Id('flag'),ArrayLiteral([IntLiteral(0),IntLiteral(1),IntLiteral(2),IntLiteral(3),IntLiteral(4),IntLiteral(5),IntLiteral(6)])]),[],[CallStmt(Id('test_'),[ArrayCell(Id('flag'),[Id('i')])])]),(UnaryOp('!',Id('flag')),[],[Break()]),(CallExpr(Id('is___'),[Id('flag')]),[],[Assign(Id('flag'),BinaryOp('+',BinaryOp('-',BinaryOp('*',Id('flag'),Id('ad')),IntLiteral(123)),BinaryOp('%',ArrayLiteral([IntLiteral(1),IntLiteral(2)]),StringLiteral("""124"""))))])], ([],[CallStmt(Id('println'),[StringLiteral("""da""")]),CallStmt(Id('delete'),[Id('flag')])]))])),FuncDecl(Id('main'), [VarDecl(Id('flags'), [100], None),VarDecl(Id('len'), [], None)],([],[For(Id('i'),IntLiteral(0),BinaryOp('<',Id('i'),Id('len')),IntLiteral(1), ([],[CallStmt(Id('test_'),[ArrayCell(Id('flags'),[Id('i')])])])),Return(IntLiteral(0))]))])
         self.assertTrue(TestAST.checkASTGen(input,expect,399))
-    
-    
+    def test_case_101(self):
+        input = """
+        Var: x;
+        Var: y = 2;
+        Function: main
+        Body:
+            While i Do
+            EndWhile.
+        EndBody.
+        """
+        expect = Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [],IntLiteral(2)),FuncDecl(Id('main'), [],([],[While(Id('i'),([],[]))]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 400))
+    def test_case_102(self):
+        input = """
+        Var: x;
+        Var: y = 2;
+        Function: main
+        Body:
+            While y == 2 Do
+                Var: i;
+                For(i = 1, i < 2, y) Do
+                    Break;
+                EndFor.
+                Break;
+            EndWhile.
+            Break;
+        EndBody.
+        """
+        expect = Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [],IntLiteral(2)),FuncDecl(Id('main'), [],([],[While(BinaryOp('==',Id('y'),IntLiteral(2)),([VarDecl(Id('i'), [], None)],[For(Id('i'),IntLiteral(1),BinaryOp('<',Id('i'),IntLiteral(2)),Id('y'), ([],[Break()])),Break()])),Break()]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 401))
+    def test_case_103(self):
+        input = """
+        Var: x;
+        Var: y = 2;
+        Function: main
+        Body:
+            While y == 2 Do
+                Var: i;
+                For(i = 1, i < 2, y) Do
+                    Break;
+                EndFor.
+            EndWhile.
+        EndBody.
+        """
+        expect = Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [],IntLiteral(2)),FuncDecl(Id('main'), [],([],[While(BinaryOp('==',Id('y'),IntLiteral(2)),([VarDecl(Id('i'), [], None)],[For(Id('i'),IntLiteral(1),BinaryOp('<',Id('i'),IntLiteral(2)),Id('y'), ([],[Break()]))]))]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 402))
+    def test_case_104(self):
+        input = """
+        Var: x;
+        Var: y = 2;
+        Function: main
+        Body:
+            Var: x = {{1, 2}, {2, 3}};
+        EndBody.
+        """
+        expect =  Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [],IntLiteral(2)),FuncDecl(Id('main'), [],([VarDecl(Id('x'), [],ArrayLiteral([ArrayLiteral([IntLiteral(1),IntLiteral(2)]),ArrayLiteral([IntLiteral(2),IntLiteral(3)])]))],[]))])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 403))
+    def test_case_105(self):
+        input = """
+        Var: x, y;
+        Function: foo
+        Body:
+            foo();
+        EndBody.
+        Function: main
+        Body:
+            foo();   
+        EndBody.
+        """
+        expect = ''
+        self.assertTrue(TestAST.checkASTGen(input, expect, 404))
     

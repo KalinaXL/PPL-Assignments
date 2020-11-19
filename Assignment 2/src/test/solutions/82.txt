@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(fi)),VarDecl(Id(fo)),VarDecl(Id(in))][Assign(Id(fi),CallExpr(Id(open),[StringLiteral(input.txt),StringLiteral(r)])),Assign(Id(in),CallExpr(Id(fread),[Id(fi)])),CallStmt(Id(close),[Id(fi)]),Assign(Id(fo),CallExpr(Id(open),[StringLiteral(output.txt),StringLiteral(w)])),CallStmt(Id(fwrite),[Id(fo),Id(in)]),CallStmt(Id(close),[Id(fo)])]))])

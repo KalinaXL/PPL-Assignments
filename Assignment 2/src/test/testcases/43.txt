@@ -1,0 +1,14 @@
+
+		Function: main
+		Body:
+			** case-sensitive 
+			*  it will fail in next phase
+			**
+			Var: x = 10,walkVar;
+			walkVar = x \. 10;
+			For (walkvar = 0, walKVAr < x, walkVar + 1) Do
+				x = (x + walkvar * random());
+			EndFor.
+			Return x;
+		EndBody.
+		

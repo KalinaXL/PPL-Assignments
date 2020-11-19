@@ -1,0 +1,15 @@
+
+        Var: x;
+        Var: y = 2;
+        Function: main
+        Body:
+            While y == 2 Do
+                Var: i;
+                For(i = 1, i < 2, y) Do
+                    Break;
+                EndFor.
+                Break;
+            EndWhile.
+            Break;
+        EndBody.
+        

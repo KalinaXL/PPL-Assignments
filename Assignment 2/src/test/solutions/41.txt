@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(x),IntLiteral(10)),VarDecl(Id(walkVar))][Assign(Id(walkVar),BinaryOp(\.,Id(x),IntLiteral(10))),For(Id(walkvar),IntLiteral(0),BinaryOp(<,Id(walKVAr),Id(x)),BinaryOp(+,Id(walkVar),IntLiteral(1)),[],[Assign(Id(x),BinaryOp(+,Id(x),BinaryOp(*,Id(walkvar),CallExpr(Id(random),[]))))]),Return(Id(x))]))])

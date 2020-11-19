@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(recur_fibo)[VarDecl(Id(n))],([][If(BinaryOp(<,Id(n),IntLiteral(2)),[],[Return(IntLiteral(1))])Else([],[]),Return(BinaryOp(+,CallExpr(Id(recur_fibo),[BinaryOp(-,Id(n),IntLiteral(1))]),CallExpr(Id(recur_fibo),[BinaryOp(-,Id(n),IntLiteral(2))])))]))])

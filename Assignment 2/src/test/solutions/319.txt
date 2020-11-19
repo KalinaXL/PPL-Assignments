@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('convert'), [VarDecl(Id('str'), [], None)],([VarDecl(Id('arr'), [100], None),VarDecl(Id('length'), [], None)],[Assign(Id('length'),BinaryOp('-',CallExpr(Id('length'),[Id('str')]),IntLiteral(1))),Return(Id('length'))])),FuncDecl(Id('main'), [],([],[CallStmt(Id('convert'),[])]))])

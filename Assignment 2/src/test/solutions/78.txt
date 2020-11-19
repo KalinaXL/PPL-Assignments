@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(foo)[],([][Return(IntLiteral(0))])),FuncDecl(Id(foo1)[],([][Return(IntLiteral(1))])),FuncDecl(Id(foo2)[],([][Return(IntLiteral(2))])),FuncDecl(Id(foo3)[],([][Return(IntLiteral(3))])),FuncDecl(Id(foo4)[],([][Return(IntLiteral(4))]))])

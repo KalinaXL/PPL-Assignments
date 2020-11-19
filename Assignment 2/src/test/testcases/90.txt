@@ -1,0 +1,21 @@
+
+		Function: main
+		Body:
+			Var: n = 10, res = 0;
+			If (random()>n) Then 
+				Var: x = 1;
+				Var: t = 2;
+				res = x && t;
+			ElseIf (random() > n) Then
+				Var: x = 2;
+				Var: n = 3;
+				res = res + 2;
+				If (random() > n) Then
+					Var: x = 4;
+					print(string_of_int(n));
+					res = res + 9;
+				EndIf.
+			EndIf. 
+			print(string_of_int(res));
+		EndBody.
+		

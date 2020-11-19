@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('is_valid_index'), [VarDecl(Id('arr'), [10], None),VarDecl(Id('max_length'), [], None),VarDecl(Id('index'), [], None)],([],[If([(BinaryOp('>=',Id('index'),Id('max_length')),[],[CallStmt(Id('raise'),[CallExpr(Id('error'),[])])])], ([],[Return(ArrayCell(Id('arr'),[Id('index')]))]))]))])

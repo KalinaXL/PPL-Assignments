@@ -110,14 +110,15 @@ class ASTGeneration(BKITVisitor):
     def visitAssignment(self, ctx: BKITParser.AssignmentContext):
         if ctx.IDENTIFIER(): 
             lhs = Id(ctx.IDENTIFIER().getText())
-            if ctx.indices():
-                indices = ctx.indices().accept(self)
-                lhs = ArrayCell(lhs, indices)
-        elif ctx.call_function(): 
-            lhs = ctx.call_function().accept(self)
+            value = ctx.expression(0).accept(self)
+            # if ctx.indices():
+            #     indices = ctx.indices().accept(self)
+            #     lhs = ArrayCell(lhs, indices)
+        elif ctx.expression(): 
+            lhs = ctx.expression(0).accept(self)
             indices = ctx.indices().accept(self)
             lhs = ArrayCell(lhs, indices)
-        value = ctx.expression().accept(self)
+            value = ctx.expression(1).accept(self)
         return Assign(lhs, value)
 
     def visitIf_start(self, ctx: BKITParser.If_startContext):

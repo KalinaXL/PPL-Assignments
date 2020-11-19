@@ -1,0 +1,7 @@
+
+        Function: test
+        Body:
+            x = f == (d > 43)  \ (!-(4 =/= f(k + 2, k())) % 9 == 2);
+            x = (!x || True) * kd[12] == 2 % 123 && False \ blala;
+            Return;
+        EndBody.

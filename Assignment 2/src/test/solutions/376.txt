@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('test'), [VarDecl(Id('str'), [], None)],([],[Assign(Id('l'),CallExpr(Id('split'),[Id('str'),StringLiteral(""" """)])),If([(UnaryOp('!',Id('l')),[],[CallStmt(Id('print'),[StringLiteral("""empty string""")])])], ([],[])),Return(CallExpr(Id('array'),[Id('l')]))]))])

@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(n),IntLiteral(100))][CallStmt(Id(printLn),[StringLiteral(This program is missing a dot)]),If(BinaryOp(==,CallExpr(Id(isPrime),[Id(n)]),BooleanLiteral(true)),[],[CallStmt(Id(print),[StringLiteral(Is a prime number)])])Else([],[CallStmt(Id(print),[StringLiteral(Is not a prime number)])])]))])

@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('test'), [],([],[If([(BinaryOp('==',Id('n'),IntLiteral(0)),[],[Return(Id('n'))])], ([],[If([(BinaryOp('>',Id('test'),IntLiteral(0)),[],[CallStmt(Id('print'),[StringLiteral("""akakakak""")])])], ([],[])),Return(BinaryOp('+',BinaryOp('%',Id('n'),IntLiteral(10)),CallExpr(Id('test'),[BinaryOp('\',Id('n'),IntLiteral(10))])))]))]))])

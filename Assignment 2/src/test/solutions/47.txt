@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[VarDecl(Id(x)),VarDecl(Id(y)),VarDecl(Id(z))],([VarDecl(Id(num))][Assign(Id(num),CallExpr(Id(int_of_string),[CallExpr(Id(read),[])])),If(BinaryOp(>,Id(x),Id(num)),[],[Return(Id(x))])ElseIf(BinaryOp(>,Id(y),Id(num)),[],[Return(Id(y))])ElseIf(BinaryOp(>,Id(z),Id(num)),[],[Return(Id(z))])Else([],[]),Return(UnaryOp(-,IntLiteral(1)))]))])

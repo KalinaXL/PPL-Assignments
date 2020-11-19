@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(inp))][CallStmt(Id(print),[StringLiteral(Nhap vao mot so: )]),Assign(Id(inp),CallExpr(Id(int_of_string),[CallExpr(Id(read),[])])),Assign(Id(out),CallExpr(Id(predict),[Id(inp)])),CallStmt(Id(print),[Id(out)])])),FuncDecl(Id(predict)[VarDecl(Id(number))],([][Return(StringLiteral(Ban la nguoi thong minh))]))])

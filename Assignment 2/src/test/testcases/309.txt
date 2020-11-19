@@ -1,0 +1,9 @@
+
+        Function: main
+        Body:
+            Do
+                a[3 + foo(2)] = a[b[2][3]] + 4;
+            While i == False EndDo.
+
+        EndBody.
+        

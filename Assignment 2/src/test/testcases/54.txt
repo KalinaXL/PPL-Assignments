@@ -1,0 +1,11 @@
+
+		Function: main
+		Body:
+			Var: isEmpty = True;
+			Var: x[10] = {};
+			print(string_of_bool(isEmpty));
+			x = insert(x,0,1);
+			isEmpty = False;
+			print(string_of_bool(isEmpty));
+		EndBody.
+		

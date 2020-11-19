@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(str))][CallStmt(Id(print),[StringLiteral(Nhap chuoi: )]),Assign(Id(str),CallExpr(Id(read),[])),CallStmt(Id(print),[StringLiteral(Chuoi da nhap: )]),CallStmt(Id(printLn),[Id(str)])]))])

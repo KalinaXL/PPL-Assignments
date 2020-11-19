@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('ooooo'), [],([],[While(UnaryOp('!',CallExpr(Id('compile'),[])),([],[])),While(UnaryOp('!',CallExpr(Id('linker'),[])),([],[])),If([(Id('flag'),[],[CallStmt(Id('loader'),[])])], ([],[CallStmt(Id('fail'),[])])),Return(CallExpr(Id('runner'),[]))]))])

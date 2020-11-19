@@ -1,0 +1,14 @@
+
+		Var: x,y,z;
+		Function: main
+		Parameter: y,b
+		Body:
+			Var: x,arr[10];
+			x = arr[1] * arr[0] + arr[2] \ arr[4];
+			If (random() > 10) Then print("1");
+				ElseIf (random() > 10) Then print("2");
+				ElseIf (random() > 10) Then print("3");
+				Else print(string_of_float(random()));
+			EndIf.
+		EndBody.
+		

@@ -1,0 +1,18 @@
+
+        Function: test
+        Body:
+            Var: x = 1;
+            print("kdkd");
+            If (((((x < 0))))) Then
+                throw(x);
+            EndIf.
+        EndBody.
+        Function: fun
+        Parameter: ptr, x
+        Body:
+            If null(ptr) Then
+                throw(ptr);
+            ElseIf x == 0 Then
+                throw(x);
+            EndIf.
+        EndBody.

@@ -1,0 +1,15 @@
+
+        Function: test
+        Parameter: a[132], b, c
+        Body:
+            Do
+                print(a[12] + b);
+                If isnull(a) Then
+                    segmentfailure(error());
+                ElseIf len(a) > 1 Then
+                    Return {1, 2, 3} + test(a, 1, len(a));
+                Else
+                    Return {0};
+                EndIf.
+            While a =/= b EndDo.
+        EndBody.

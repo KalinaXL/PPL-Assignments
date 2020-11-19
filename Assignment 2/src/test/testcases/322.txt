@@ -1,0 +1,11 @@
+
+        Function: main
+        Body:
+            Var: x = 10;
+            kk = 0o10 && 0x123 || 12.3 + True;
+            f(1 + 2, a)[2 + a[2]] = a[0][2 + 2][f()]; 
+            While x < cond() Do
+                print("string, hala madrid");
+            EndWhile.
+        EndBody.
+        

@@ -1,0 +1,1 @@
+Program([VarDecl(Id(x),IntLiteral(1)),VarDecl(Id(y)),VarDecl(Id(z)),VarDecl(Id(t)),VarDecl(Id(arr),[10],ArrayLiteral(IntLiteral(1),IntLiteral(2),IntLiteral(3))),VarDecl(Id(abc),StringLiteral(This is legal string)),VarDecl(Id(x)),VarDecl(Id(helloworld))])

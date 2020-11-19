@@ -1,0 +1,13 @@
+
+        Function: test
+        Body:
+            For(i = f() * fp()[12][0x13], i < f()[13], fn(f)[0o123]) Do
+                Var: x;
+                If x == 1 Then f(); k = kad();
+                ElseIf x Then 
+                While i < -12 Do
+                Var: m;
+                EndWhile.
+                EndIf.
+            EndFor.
+        EndBody.

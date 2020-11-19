@@ -1,0 +1,15 @@
+
+		Function: main
+		Body:
+			Var: stack = {},i;
+			For (i=0, i<20, i+1) Do
+				Var: n;
+				n = random();
+				If n>0 Then push(stack,n);
+				Else 
+					i = i + top(stack);
+					pop(stack);
+				EndIf.
+			EndFor.
+		EndBody.
+		

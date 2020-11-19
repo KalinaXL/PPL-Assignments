@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(n))][While(BooleanLiteral(true),[],[Assign(Id(n),CallExpr(Id(int_of_string),[CallExpr(Id(read),[])])),If(BinaryOp(>,Id(n),IntLiteral(10)),[],[Break()])Else([],[CallStmt(Id(print),[StringLiteral(n<10, Try again)])])]),CallStmt(Id(print),[StringLiteral(Accepted)])]))])

@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([][If(BinaryOp(||,BinaryOp(&&,BinaryOp(>,IntLiteral(1),IntLiteral(0)),BinaryOp(<=,IntLiteral(5),IntLiteral(15))),BinaryOp(>,FloatLiteral(1.0),UnaryOp(-,IntLiteral(4)))),[],[CallStmt(Id(print),[StringLiteral(HELLO)])])Else([],[CallStmt(Id(print),[StringLiteral(KHONG HELLO :))])])]))])

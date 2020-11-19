@@ -1,0 +1,24 @@
+
+        Function: test
+        Parameter: arr[1000]
+        Body:
+            If !len(arr) Then Return {}; EndIf.
+            Return reduce(arr[0] + t(arr, 1), arr, {});
+            Do
+                Var: l = 0;
+                l = print() * das;
+                If l < 10 Then
+                    Var: p;
+                    If j < l Then
+                        Var: op;
+                        If l >=. 100 Then
+                            print("Hello World!");
+                        ElseIf l >. 50 Then
+                            print("string string");
+                        Else
+                            print("-213++314");
+                        EndIf.
+                    EndIf.
+                EndIf.
+            While guard() EndDo.
+        EndBody.

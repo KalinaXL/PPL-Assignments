@@ -1,0 +1,8 @@
+
+        Function: main
+        Body:
+            For(i = init(), i < bound(), step()) Do
+                a = in(f(in(2, f())))[f()];
+            EndFor.
+        EndBody.
+        

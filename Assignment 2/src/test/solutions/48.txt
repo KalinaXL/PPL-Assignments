@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(a),IntLiteral(1))][While(BinaryOp(==,Id(a),IntLiteral(1)),[],[CallStmt(Id(print),[StringLiteral(I\'m looping)])])]))])

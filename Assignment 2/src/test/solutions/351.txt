@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('test'), [],([VarDecl(Id('k'), [], None)],[Assign(Id('k'),BinaryOp('+',StringLiteral("""13"""),StringLiteral("""das"""))),Assign(Id('k'),BinaryOp('||',BinaryOp('&&',Id('k'),BinaryOp('-',IntLiteral(31),BinaryOp('*',IntLiteral(13),BinaryOp('==',Id('k'),IntLiteral(0))))),Id('dask')))]))])

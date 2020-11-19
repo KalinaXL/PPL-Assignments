@@ -1,0 +1,6 @@
+
+        Function: main
+        Body:
+            a = f(2, 3 + 4)[1 + 2];
+        EndBody.
+        

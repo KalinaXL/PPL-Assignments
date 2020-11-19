@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(isEmpty),BooleanLiteral(true)),VarDecl(Id(x),[10],ArrayLiteral())][CallStmt(Id(print),[CallExpr(Id(string_of_bool),[Id(isEmpty)])]),Assign(Id(x),CallExpr(Id(insert),[Id(x),IntLiteral(0),IntLiteral(1)])),Assign(Id(isEmpty),BooleanLiteral(false)),CallStmt(Id(print),[CallExpr(Id(string_of_bool),[Id(isEmpty)])])]))])

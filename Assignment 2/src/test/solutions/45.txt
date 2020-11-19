@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([][CallStmt(Id(print),[StringLiteral(The first main function)])])),FuncDecl(Id(main)[],([][CallStmt(Id(print),[StringLiteral(The second main function)])])),FuncDecl(Id(main)[],([][CallStmt(Id(print),[StringLiteral(The third main function)])]))])

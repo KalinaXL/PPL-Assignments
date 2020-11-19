@@ -1,0 +1,14 @@
+
+        Function: convert
+        Parameter: str
+        Body:
+            Var: arr[100];
+            Var: length;
+            length = length(str) - 1;
+            Return length;
+        EndBody.
+        Function: main
+        Body:
+            convert();
+        EndBody.
+        

@@ -1,0 +1,12 @@
+
+        Function: test
+        Parameter: k, a
+        Body:
+            Var: str = "this is a string";
+            Var: token;
+            token = strtok(str, "-");
+            While ((token != null)) Do
+                printf("%s", token);
+                token = strtok(str, "-");
+            EndWhile.
+        EndBody.

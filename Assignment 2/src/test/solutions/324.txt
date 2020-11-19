@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('main'), [],([],[For(Id('i'),CallExpr(Id('init'),[]),BinaryOp('<',Id('i'),CallExpr(Id('bound'),[])),CallExpr(Id('step'),[]), ([],[Assign(Id('a'),ArrayCell(CallExpr(Id('in'),[CallExpr(Id('f'),[CallExpr(Id('in'),[IntLiteral(2),CallExpr(Id('f'),[])])])]),[CallExpr(Id('f'),[])]))]))]))])

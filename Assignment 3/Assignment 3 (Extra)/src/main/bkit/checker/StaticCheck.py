@@ -121,10 +121,10 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         v, counter = None, 0
         for stmt in ast.body[1]:
             v = stmt.accept(self, new_env)
-            if v == StaticChecker.RETURN:
-                counter += 1
             if counter == 1:
                 raise UnreachableStatement(stmt)
+            if v == StaticChecker.RETURN:
+                counter += 1
 
         if len(self.func_rettypes) > 1:
             for rettype in self.func_rettypes:
@@ -242,7 +242,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             if get_type(right_type) is Unknown:
                 raise TypeCannotBeInferred(ast)
             else:
-                check_and_assign(left_type, get_type(right_type)(1))
+                check_and_assign(left_type, get_type(right_type)())
         elif get_type(right_type) is Unknown and get_type(left_type) is not Unknown:
             raise TypeMismatchInStatement(ast)
     
@@ -255,19 +255,21 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             v, counter = None, 0
             for stmt in stmts:
                 v = stmt.accept(self, new_env)
-                if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
-                    counter += 1
                 if counter == 1:
                     raise UnreachableStatement(stmt)
+                if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                    counter += 1
+
         var_decls, stmts = ast.elseStmt
         new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
         v, counter = None, 0
         for stmt in stmts:
             v = stmt.accept(self, new_env)
-            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
-                    counter += 1
             if counter == 1:
                 raise UnreachableStatement(stmt)
+            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                    counter += 1
+            
     def visitFor(self, ast, param):
         exp1_type = ast.expr1.accept(self, param)
         if get_type(exp1_type) is not IntType:
@@ -287,10 +289,11 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         v, counter = None, 0
         for stmt in ast.loop[1]:
             v = stmt.accept(self, new_env)
-            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
-                counter += 1
             if counter == 1:
                 raise UnreachableStatement(stmt)
+            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                counter += 1
+            
         self.in_loop_counter -= 1
     
     def visitContinue(self, ast, param):
@@ -324,10 +327,11 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         v, counter = None, 0
         for stmt in ast.sl[1]:
             v = stmt.accept(self, new_env)  
-            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
-                counter += 1
             if counter == 1:
                 raise UnreachableStatement(stmt)
+            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                counter += 1
+            
         self.in_loop_counter -= 1
 
     def visitWhile(self, ast, param):
@@ -339,10 +343,11 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         v, counter = None, 0
         for stmt in ast.sl[1]:
             v = stmt.accept(self, new_env)  
-            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
-                counter += 1
             if counter == 1:
                 raise UnreachableStatement(stmt)
+            if v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                counter += 1
+            
         self.in_loop_counter -= 1
 
     def visitCallStmt(self, ast, param):
@@ -352,6 +357,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         fn = func[0]
         if fn.name != self.current_fn:
             self.fn_called.add(fn.name)
+        
         if get_type(fn.mtype.restype) is not VoidType:
             raise TypeMismatchInStatement(ast)
         elif len(fn.mtype.intype) != len(ast.param):

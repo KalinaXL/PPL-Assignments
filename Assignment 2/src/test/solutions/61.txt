@@ -1,0 +1,1 @@
+Program([FuncDecl(Id(main)[],([VarDecl(Id(arr),[20]),VarDecl(Id(n))][For(Id(x),IntLiteral(1),BinaryOp(<,Id(x),IntLiteral(10)),BinaryOp(+,Id(x),IntLiteral(1)),[],[Assign(ArrayCell(Id(arr),[BinaryOp(%,BinaryOp(*,BinaryOp(+,BinaryOp(*,Id(x),IntLiteral(2)),IntLiteral(7)),IntLiteral(9)),IntLiteral(20))]),BinaryOp(+,CallExpr(Id(random),[IntLiteral(0),IntLiteral(1)]),Id(n)))])]))])

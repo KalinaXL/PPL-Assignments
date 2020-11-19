@@ -1,0 +1,12 @@
+
+        Function: test
+        Body:
+            If n == 0 Then
+                Return n;
+            Else
+                If test > 0 Then
+                    print("akakakak");
+                EndIf.
+                Return n % 10 + test(n \ 10);
+            EndIf.
+        EndBody.

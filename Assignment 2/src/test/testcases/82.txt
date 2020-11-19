@@ -1,0 +1,13 @@
+
+		Function: main
+		Body:
+			Var: fi,fo,in;
+			fi = open("input.txt","r");
+			in = fread(fi);
+			close(fi);
+
+			fo = open("output.txt","w");
+			fwrite(fo,in);
+			close(fo);
+		EndBody.
+		

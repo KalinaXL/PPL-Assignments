@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('main'), [VarDecl(Id('k'), [], None)],([VarDecl(Id('i'), [],IntLiteral(10)),VarDecl(Id('k'), [10,2],ArrayLiteral([ArrayLiteral([]),ArrayLiteral([])]))],[Dowhile(([],[Continue()]),BinaryOp('<=',Id('i'),IntLiteral(10))),Return(IntLiteral(0))]))])

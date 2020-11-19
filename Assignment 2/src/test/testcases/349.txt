@@ -1,0 +1,10 @@
+
+        Function: test
+        Parameter: a, b[10][0o12][0x43]
+        Body:
+            a[2 + f()[12] * ((adr[0o23] >=. d) -. 32)] = kh;
+            flag = -. True && !f(2) % 2 || f == 32;
+            While cond()[123][0x312][0o32] Do
+                print("dasd");
+            EndWhile.
+        EndBody.

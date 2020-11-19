@@ -1,0 +1,15 @@
+
+        Function: test
+        Body:
+            Var: guard = 0;
+            While guard Do
+                a[i] = b +. 1.;
+                If i % 2 Then
+                    Do
+                        x = test();
+                    While (a >=. b) EndDo.
+                ElseIf i Then
+                    test()[123] = 123;
+                EndIf.
+            EndWhile.
+        EndBody.

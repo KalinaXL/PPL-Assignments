@@ -1,0 +1,1 @@
+Program([VarDecl(Id('ar'), [19,2,23], None),FuncDecl(Id('ppl'), [VarDecl(Id('threshold'), [], None)],([],[If([(BinaryOp('>=',Id('score'),Id('threshold')),[],[Return(StringLiteral("""Pass"""))])], ([],[Return(StringLiteral("""Again"""))])),Return(Id('ppl'))]))])

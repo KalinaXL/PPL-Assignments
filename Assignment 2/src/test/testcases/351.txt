@@ -1,0 +1,7 @@
+
+        Function: test
+        Body:
+            Var: k;
+            k = "13" + "das";
+            k = k && 31 - 13 * (k == 0) || dask;
+        EndBody.

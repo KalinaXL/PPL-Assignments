@@ -1,0 +1,1 @@
+Program([FuncDecl(Id('max'), [VarDecl(Id('x'), [], None),VarDecl(Id('y'), [], None)],([],[If([(BinaryOp('>',Id('x'),Id('y')),[],[Return(Id('x'))])], ([],[Return(Id('y'))]))])),FuncDecl(Id('main'), [],([VarDecl(Id('a'), [],IntLiteral(10)),VarDecl(Id('b'), [],IntLiteral(20))],[CallStmt(Id('print'),[StringLiteral("""%d"""),CallExpr(Id('max'),[Id('a'),Id('b')])]),Return(None)]))])

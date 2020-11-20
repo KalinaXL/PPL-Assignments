@@ -1,1 +1,0 @@
-str(TypeMismatchInExpression(CallExpr(Id('read'),[IntLiteral(4)])))

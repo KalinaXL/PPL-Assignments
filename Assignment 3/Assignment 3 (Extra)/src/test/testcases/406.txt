@@ -1,1 +1,0 @@
-Program([FuncDecl(Id('no_main'), [],([VarDecl(Id('main'), [], None)],[CallStmt(Id('printStrLn'),[StringLiteral("""Hello World""")])]))])

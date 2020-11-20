@@ -305,13 +305,13 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             dims = arr.dimen
         self.eval_index = not self.first_iter
         if self.eval_index:
-            try:
-                for i, idx in enumerate(ast.idx):
+            for i, idx in enumerate(ast.idx):
+                try:
                     value = idx.accept(self, param)
                     if value < 0 or value >= dims[i]:
                         raise IndexOutOfRange(ast)
-            except NotIntegerNumber:
-                pass
+                except NotIntegerNumber:
+                    pass
         remaining_dims = dims[len(ast.idx): ]
         if remaining_dims:
             return ArrayType(remaining_dims, arr.mtype.eletype)

@@ -1,1 +1,0 @@
-str(TypeMismatchInStatement(Assign(Id('k'),Id('x'))))

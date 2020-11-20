@@ -1,1 +1,0 @@
-str(IndexOutOfRange(ArrayCell(Id('x'),[BinaryOp('+',IntLiteral(2),IntLiteral(15)),BinaryOp('\',IntLiteral(8),IntLiteral(2))])))

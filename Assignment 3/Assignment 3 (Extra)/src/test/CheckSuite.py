@@ -260,12 +260,20 @@ class CheckSuite(unittest.TestCase):
     def test_case_24(self):
         """
         Var: x, y;
+        Function: foo
+        Parameter: n
+        Body:
+            n = 10 * 2 - 1;
+            Return n;
+        EndBody.
         Function: main
         Body:
-            Var: x[10];
-            x[2+15] = 20;
+            Var: x[10][10][10][5];
+            Var: n;
+            Var: k = 0x12;
+            x[n + 2][foo(k) + 2][2 + 15][8 \ 2] = 20;
         EndBody.
         """
-        input = Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [], None),FuncDecl(Id('main'), [],([VarDecl(Id('x'), [10,5], None)],[Assign(ArrayCell(Id('x'),[BinaryOp('+',IntLiteral(2),IntLiteral(15)),BinaryOp('\\',IntLiteral(8),IntLiteral(2))]),IntLiteral(20))]))])
-        expect = str(IndexOutOfRange(ArrayCell(Id('x'),[BinaryOp('+',IntLiteral(2),IntLiteral(15)),BinaryOp('\\',IntLiteral(8),IntLiteral(2))])))
+        input = Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [], None),FuncDecl(Id('foo'), [VarDecl(Id('n'), [], None)],([],[Assign(Id('n'),BinaryOp('-',BinaryOp('*',IntLiteral(10),IntLiteral(2)),IntLiteral(1))),Return(Id('n'))])),FuncDecl(Id('main'), [],([VarDecl(Id('x'), [10,10,10,5], None),VarDecl(Id('n'), [], None),VarDecl(Id('k'), [],IntLiteral(18))],[Assign(ArrayCell(Id('x'),[BinaryOp('+',Id('n'),IntLiteral(2)),BinaryOp('+',CallExpr(Id('foo'),[Id('k')]),IntLiteral(2)),BinaryOp('+',IntLiteral(2),IntLiteral(15)),BinaryOp('\\',IntLiteral(8),IntLiteral(2))]),IntLiteral(20))]))])
+        expect = str(IndexOutOfRange(ArrayCell(Id('x'),[BinaryOp('+',Id('n'),IntLiteral(2)),BinaryOp('+',CallExpr(Id('foo'),[Id('k')]),IntLiteral(2)),BinaryOp('+',IntLiteral(2),IntLiteral(15)),BinaryOp('\\',IntLiteral(8),IntLiteral(2))])))
         self.assertTrue(TestChecker.test(input, expect, 423))

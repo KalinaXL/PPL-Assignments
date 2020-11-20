@@ -1,1 +1,0 @@
-Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [], None),FuncDecl(Id('foo'), [VarDecl(Id('a'), [], None),VarDecl(Id('b'), [], None)],([],[Assign(Id('a'),IntLiteral(2)),Assign(Id('b'),BinaryOp('*',Id('a'),Id('a')))])),FuncDecl(Id('main'), [],([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [], None)],[CallStmt(Id('foo'),[Id('x'),Id('y')])]))])

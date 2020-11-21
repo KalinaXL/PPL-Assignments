@@ -1568,12 +1568,17 @@ class ASTGenSuite(unittest.TestCase):
         input = """
         Var: x, y;
         Function: foo
+        Parameter: n
         Body:
-            foo();
+            n = 10 * 2 - 1;
+            Return n;
         EndBody.
         Function: main
         Body:
-            foo();   
+            Var: x[10][10][10][5];
+            Var: n;
+            Var: k = 0x12;
+            x[n + 2][foo(k) + 2][2 + 15][8 \ 2] = 20;
         EndBody.
         """
         expect = ''

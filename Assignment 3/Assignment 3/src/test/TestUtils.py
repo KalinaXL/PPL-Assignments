@@ -152,6 +152,9 @@ class TestChecker:
             dest.close()
         dest = open("./test/solutions/" + str(num) + ".txt","r")
         line = dest.read()
+        if line != expect:
+            print('RESULT:', line)
+            print('EXPECT:', expect)
         return line == expect
 
     @staticmethod

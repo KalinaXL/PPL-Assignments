@@ -31,7 +31,7 @@ class Undeclared(StaticError):
     n: str  # name of identifier
     
     def __str__(self):
-        return  "Undeclared "+ str(self.k) + ": " + self.n
+        return  "str(Undeclared("+ str(self.k) + "(), '" + self.n + "'))"
 
 @dataclass
 class Redeclared(StaticError):
@@ -39,72 +39,72 @@ class Redeclared(StaticError):
     n: str # name of identifier 
     
     def __str__(self):
-        return  "Redeclared "+ str(self.k) + ": " + self.n
+        return  "str(Redeclared("+ str(self.k) + "(), '" + self.n + "'))"
 
 @dataclass
 class TypeMismatchInExpression(StaticError):
     exp: Expr
 
     def __str__(self):
-        return  "Type Mismatch In Expression: "+ str(self.exp)
+        return  "str(TypeMismatchInExpression("+ str(self.exp) + '))'
 
 @dataclass
 class TypeMismatchInStatement(StaticError):
     stmt: Stmt
 
     def __str__(self):
-        return "Type Mismatch In Statement: "+ str(self.stmt)
+        return "str(TypeMismatchInStatement("+ str(self.stmt) + '))'
 
 @dataclass
 class TypeCannotBeInferred(StaticError):
     stmt: Stmt
 
     def __str__(self):
-        return "Type Cannot Be Inferred: "+ str(self.stmt)
+        return "str(TypeCannotBeInferred("+ str(self.stmt) + '))'
 
 class NoEntryPoint(StaticError):
     def __str__(self):
-        return "No Entry Point"
+        return "str(NoEntryPoint())"
 
 @dataclass
 class NotInLoop(StaticError):
     stmt: Stmt
 
     def __str__(self):
-        return "Statement Not In Loop: " + str(self.stmt)
+        return "str(NotInLoop(" + str(self.stmt) + "))"
 
 @dataclass
 class InvalidArrayLiteral(StaticError):
     arr: ArrayLiteral
 
     def __str__(self):
-        return "Invalid Array Literal: " + str(self.arr)
+        return "str(InvalidArrayLiteral(" + str(self.arr) + '))'
 
 @dataclass
 class FunctionNotReturn(StaticError):
     name: str
 
     def __str__(self):
-        return "Function Not Return: " + self.name
+        return "str(FunctionNotReturn(" + self.name + '))'
 
 @dataclass
 class UnreachableFunction(StaticError):
     name: str
 
     def __str__(self):
-        return "Unreachable Function: " + self.name
+        return "str(UnreachableFunction('" + self.name + "'))"
 
 @dataclass
 class UnreachableStatement(StaticError):
     stmt: Stmt
 
     def __str__(self):
-        return "Unreachable Statement: " + str(self.stmt)
+        return "str(UnreachableStatement(" + str(self.stmt) + '))'
 
 @dataclass
 class IndexOutOfRange(StaticError):
     cell: ArrayCell
 
     def __str__(self):
-        return "Index Out Of Range: " + str(self.cell)
+        return "str(IndexOutOfRange(" + str(self.cell) + '))'
 

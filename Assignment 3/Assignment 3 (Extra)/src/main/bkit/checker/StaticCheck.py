@@ -48,11 +48,16 @@ class Symbol:
 
 def get_type(obj):
     if type(obj) is Symbol:
+        if type(obj.mtype) is MType:
+            return type(obj.mtype.restype)
         return type(obj.mtype)
     return type(obj)
 def check_and_assign(obj, tp):
-    if type(obj) is Symbol and type(obj.mtype) is Unknown:
-        obj.mtype = tp
+    if type(obj) is Symbol:
+        if type(obj.mtype) is Unknown:
+            obj.mtype = tp
+        elif type(obj.mtype) is MType and type(obj.mtype.restype) is Unknown:
+            obj.mtype.restype = tp
 class NotIntegerNumber(Exception):
     pass
 
@@ -93,10 +98,11 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         var_decls = list(filter(lambda decl: type(decl) is VarDecl, ast.decl))
         func_decls = list(filter(lambda decl: type(decl) is FuncDecl, ast.decl))
         var_envs = reduce(lambda env, ele: ele.accept(self, env), var_decls, (self.global_envi, []))
-        try:
-            func_envs = reduce(lambda env, ele: ele.accept(self, env), func_decls, var_envs)
-        except:
-            func_envs = var_envs
+        # try:
+        #     func_envs = reduce(lambda env, ele: ele.accept(self, env), func_decls, var_envs)
+        # except:
+        #     func_envs = var_envs
+        func_envs = reduce(lambda env, ele: ele.accept(self, env), func_decls, var_envs)
         self.first_iter = False
         reduce(lambda env, ele: ele.accept(self, env), func_decls, func_envs)
         # reduce(lambda env, ele: ele.accept(self, env), ast.decl + ast.decl, (self.global_envi, []))
@@ -150,7 +156,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 if type(rettype[0]) is str:
                     rettype = eval(rettype[0])
                 else:
-                    rettype = rettype[0]
+                    rettype = rettype[0]()
             else:
                 rettype = VoidType()
         self.func_rettypes = set()
@@ -171,42 +177,42 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 raise NotIntegerNumber()
             return self.eval_index_exp(ast.op, left_exp, right_exp)
         if ast.op in ['&&', '||']:
-            if self.first_iter:
-                return BoolType()
             check_and_assign(left_exp, BoolType())
             check_and_assign(right_exp, BoolType())
+            if self.first_iter:
+                return BoolType()
             if get_type(left_exp) is BoolType and get_type(right_exp) is BoolType:
                 return BoolType()
             raise TypeMismatchInExpression(ast)
         elif ast.op in ['+', '-', '*', '\\', '%']:
-            if self.first_iter:
-                return IntType()
             check_and_assign(left_exp, IntType())
             check_and_assign(right_exp, IntType())
+            if self.first_iter:
+                return IntType()
             if get_type(left_exp) is IntType and get_type(right_exp) is IntType:
                 return IntType()
             raise TypeMismatchInExpression(ast)
         elif ast.op in ['==', '!=', '<', '>', '<=', '>=']:
-            if self.first_iter:
-                return BoolType()
             check_and_assign(left_exp, IntType())
             check_and_assign(right_exp, IntType())
+            if self.first_iter:
+                return BoolType()
             if get_type(left_exp) is IntType and get_type(right_exp) is IntType:
                 return BoolType()
             raise TypeMismatchInExpression(ast)
         elif ast.op in ['+.', '-.', '*.', '\.']:
-            if self.first_iter:
-                return FloatType()
             check_and_assign(left_exp, FloatType())
             check_and_assign(right_exp, FloatType())
+            if self.first_iter:
+                return FloatType()
             if get_type(left_exp) is FloatType and get_type(right_exp) is FloatType:
                 return FloatType()
             raise TypeMismatchInExpression(ast)
         elif ast.op in ['=/=', '<.', '>.', '<=.', '>=.']:
-            if self.first_iter:
-                return BoolType()
             check_and_assign(left_exp, FloatType())
             check_and_assign(right_exp, FloatType())
+            if self.first_iter:
+                return BoolType()
             if get_type(left_exp) is FloatType and get_type(right_exp) is FloatType:
                 return BoolType()
             raise TypeMismatchInExpression(ast)
@@ -218,23 +224,23 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 raise NotIntegerNumber()
             return self.eval_index_exp(ast.op, exp)
         if ast.op == '!':
+            check_and_assign(exp, BoolType())
             if self.first_iter:
                 return BoolType()
-            check_and_assign(exp, BoolType())
             if isinstance(exp, BoolType):
                 return BoolType()
             raise TypeMismatchInExpression(ast)
         elif ast.op == '-':
+            check_and_assign(exp, IntType())
             if self.first_iter:
                 return IntType()
-            check_and_assign(exp, IntType())
             if isinstance(exp, IntType):
                 return IntType()
             raise TypeMismatchInExpression(ast)
         elif ast.op == '-.':
+            check_and_assign(exp, FloatType())
             if self.first_iter:
                 return FloatType()
-            check_and_assign(exp, FloatType())
             if isinstance(exp, FloatType):
                 return FloatType()
             raise TypeMismatchInExpression(ast)
@@ -276,13 +282,14 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         elif len(fn.mtype.intype) != len(ast.param):
             raise TypeMismatchInStatement(ast)
         else:
-            for tp, pr in zip(fn.mtype.intype, ast.param):
-                if get_type(tp) is Unknown:
-                    raise TypeCannotBeInferred(ast)
-                par = pr.accept(self, param)
-                check_and_assign(par, tp)
-                if get_type(tp) != get_type(par):
-                    raise TypeMismatchInStatement(ast)
+            if not self.first_iter:
+                for tp, pr in zip(fn.mtype.intype, ast.param):
+                    if get_type(tp) is Unknown:
+                        raise TypeCannotBeInferred(ast)
+                    par = pr.accept(self, param)
+                    check_and_assign(par, tp)
+                    if get_type(tp) != get_type(par):
+                        raise TypeMismatchInStatement(ast)
         return VoidType()
     
     def visitId(self, ast, param):
@@ -370,7 +377,10 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
     def visitAssign(self, ast, param):
         right_type = ast.rhs.accept(self, param)
         left_type = ast.lhs.accept(self, param)
-
+        if self.first_iter and right_type is None:
+            return
+        if right_type is None:
+            return
         if get_type(left_type) is VoidType:
             raise TypeMismatchInStatement(ast)
         elif get_type(left_type) is not Unknown and get_type(right_type) is not Unknown:
@@ -458,11 +468,11 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                     rettype = f'ArrayType(' + str(rettype.mtype.dimen) + ', ' + prime + ')'
                     self.func_rettypes.add(rettype)
                 else:
-                    self.func_rettypes.add(rettype.mtype)
+                    self.func_rettypes.add(type(rettype.mtype))
             else:
-                self.func_rettypes.add(rettype)
+                self.func_rettypes.add(type(rettype))
         else:
-            self.func_rettypes.add(VoidType())
+            self.func_rettypes.add(VoidType)
         return StaticChecker.RETURN
         
     def visitDowhile(self, ast, param):

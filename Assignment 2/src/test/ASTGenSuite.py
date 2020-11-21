@@ -1566,19 +1566,17 @@ class ASTGenSuite(unittest.TestCase):
         self.assertTrue(TestAST.checkASTGen(input, expect, 403))
     def test_case_105(self):
         input = """
-        Var: x, y;
-        Function: foo
+        Var: x, y = 12;
+        Function: main
+        Parameter: a[10]
+        Body:
+            x = 2 + test(12);
+        EndBody.
+        Function: test
         Parameter: n
         Body:
-            n = 10 * 2 - 1;
-            Return n;
-        EndBody.
-        Function: main
-        Body:
-            Var: x[10][10][10][5];
-            Var: n;
-            Var: k = 0x12;
-            x[n + 2][foo(k) + 2][2 + 15][8 \ 2] = 20;
+            n = 0x1;
+            printStrLn(read());
         EndBody.
         """
         expect = ''

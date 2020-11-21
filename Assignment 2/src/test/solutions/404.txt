@@ -1,1 +1,1 @@
-Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [], None),FuncDecl(Id('foo'), [],([],[CallStmt(Id('foo'),[])])),FuncDecl(Id('main'), [],([],[CallStmt(Id('foo'),[])]))])
+Program([VarDecl(Id('x'), [], None),VarDecl(Id('y'), [],IntLiteral(12)),FuncDecl(Id('main'), [VarDecl(Id('a'), [10], None)],([],[Assign(Id('x'),BinaryOp('+',IntLiteral(2),CallExpr(Id('test'),[IntLiteral(12)])))])),FuncDecl(Id('test'), [VarDecl(Id('n'), [], None)],([],[Assign(Id('n'),IntLiteral(1)),CallStmt(Id('printStrLn'),[CallExpr(Id('read'),[])])]))])

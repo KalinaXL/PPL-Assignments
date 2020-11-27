@@ -7,7 +7,7 @@
 from abc import ABC, abstractmethod, ABCMeta
 from dataclasses import dataclass
 from typing import List, Tuple
-from AST import * 
+from AST import *
 from Visitor import *
 from StaticError import *
 from functools import *
@@ -83,14 +83,14 @@ Symbol("string_of_bool",MType([BoolType()],StringType())),
 Symbol("read",MType([],StringType())),
 Symbol("printLn",MType([],VoidType())),
 Symbol("printStr",MType([StringType()],VoidType())),
-Symbol("printStrLn",MType([StringType()],VoidType()))]   
+Symbol("printStrLn",MType([StringType()],VoidType()))]
 
         self.current_fn = None
         self.fn_decls = set()
 
     def check(self):
         return self.visit(self.ast,self.global_envi)
-    
+
     def pre_visit_fn(self, fn_decls, env):
         for fn_decl in fn_decls:
             try:
@@ -98,7 +98,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             except Redeclared as e:
                 raise Redeclared(Parameter(), e.n)
             env[0].append(Symbol(fn_decl.name.name, MType(params, Unknown())))
-        
+
 
     def visitProgram(self,ast, c):
         var_decls = list(filter(lambda decl: type(decl) is VarDecl, ast.decl))
@@ -123,19 +123,19 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if ast.varDimen:
             var_type = ArrayType(ast.varDimen, var_type)
         return param[0] + [Symbol(ast.variable.name, var_type)], param[1]
-    
+
     def visitFuncDecl(self, ast, param):
         fns = list(filter(lambda x: x.name == ast.name.name, param[0]))
         if len(fns) > 1:
             raise Redeclared(Function(), ast.name.name)
 
         var_decl_env = reduce(lambda env, ele: ele.accept(self, env), ast.body[0], (fns[0].mtype.intype, []))
-        new_env = (var_decl_env[0], var_decl_env[1] + 
+        new_env = (var_decl_env[0], var_decl_env[1] +
                                     param[0] + param[1])
         # reduce(lambda env, ele: ele.accept(self, env), ast.body[1], new_env)
         self.current_fn = ast.name.name
         self.fn_decls.add(ast.name.name)
-        
+
         for stmt in ast.body[1]:
             stmt.accept(self, new_env)
 
@@ -198,7 +198,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if type(exp) is in_type:
             return out_type()
         raise TypeMismatchInExpression(ast)
-    
+
     def visitCallExpr(self, ast, param):
         func = list(filter(lambda x: ast.method.name == x.name, param[0] + param[1]))
         if not func:
@@ -225,9 +225,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         else:
                             check_and_assign(par, tp)
                     elif get_type(tp) != get_type(par):
-                        raise TypeMismatchInExpression(ast) 
+                        raise TypeMismatchInExpression(ast)
         return fn
-        
+
     def visitCallStmt(self, ast, param):
         func = list(filter(lambda x: ast.method.name == x.name, param[0] + param[1]))
         if not func:
@@ -259,14 +259,14 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         else:
                             check_and_assign(par, tp)
                     elif get_type(tp) != get_type(par):
-                        raise TypeMismatchInStatement(ast) 
-    
+                        raise TypeMismatchInStatement(ast)
+
     def visitId(self, ast, param):
         ids = list(filter(lambda x: ast.name == x.name, param[0] + param[1]))
         if not ids:
             raise Undeclared(Identifier(), ast.name)
         return ids[0]
-    
+
     def visitArrayCell(self, ast, param):
         arr = ast.arr.accept(self, param)
         if type(arr) is Symbol:
@@ -295,7 +295,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if len(dims) != len(ast.idx):
             raise TypeMismatchInExpression(ast)
         return arr.mtype.restype.eletype if type(arr.mtype) is MType else arr.mtype.eletype
-    
+
     def handle_assign_equal_type(self, ast, left, right):
         if type(left) is ArrayType and type(right) is ArrayType:
             if left.dimen != right.dimen:
@@ -342,7 +342,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                     #
                     # Not Found a Solution
                     #
-                pass 
+                pass
             elif type(left.eletype) != type(right.mtype.eletype):
                 raise TypeMismatchInStatement(ast)
 
@@ -351,7 +351,10 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             right_type = ast.rhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
-        left_type = ast.lhs.accept(self, param)
+        try:
+            left_type = ast.lhs.accept(self, param)
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
         if get_type(left_type) is VoidType:
             raise TypeMismatchInStatement(ast)
         if type(ast.lhs) is ArrayCell:
@@ -392,7 +395,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             else:
                 left_tp = left_type
             check_and_assign(right_type, left_tp)
-    
+
     def visitIf(self, ast, param):
         for cond_exp, var_decls, stmts in ast.ifthenStmt:
             self.infer_type(cond_exp, BoolType(), param)
@@ -408,7 +411,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
         for stmt in stmts:
             stmt.accept(self, new_env)
-            
+
     def visitFor(self, ast, param):
         self.infer_type(ast.expr1, IntType(), param)
         exp1_type = ast.expr1.accept(self, param)
@@ -428,16 +431,16 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         check_and_assign(exp3_type, IntType())
         if get_type(exp2_type) is not BoolType or get_type(exp3_type) is not IntType:
             raise TypeMismatchInStatement(ast)
-        
+
         new_env = reduce(lambda env, ele: ele.accept(self, env), ast.loop[0], ([], param[0] + param[1]))
         for stmt in ast.loop[1]:
             stmt.accept(self, new_env)
-    
+
     def visitContinue(self, ast, param):
         pass
-    
+
     def visitBreak(self, ast, param):
-        pass    
+        pass
 
     def visitReturn(self, ast, param):
         fn_type = list(filter(lambda x: x.name == self.current_fn and type(x.mtype) is MType, param[0] + param[1]))[0]
@@ -482,7 +485,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         if type(tp) is ArrayType:
                             raise TypeMismatchInStatement(ast)
                         else:
-                            check_and_assign(arr.accept(self, param), tp)
+                            check_and_assign(arr.accept(self, param), tp, True)
             else:
                 if type(rettype) is Symbol:
                     if type(rettype.mtype) is MType:
@@ -517,7 +520,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                             if type(rettype.mtype.eletype) is Unknown:
                                 if type(fn_type.mtype.restype.eletype) is Unknown:
                                     raise TypeCannotBeInferred(ast)
-                                elif fn_type.mtype.restype.dimen and fn_type.mtype.restype.dimen[-1] == -1:
+                                else:
+                                    rettype.mtype.eletype = fn_type.mtype.restype.eletype
+                                if fn_type.mtype.restype.dimen and fn_type.mtype.restype.dimen[-1] == -1:
                                     fn_type.mtype.restype.dimen = rettype.mtype.dimen
                                 else:
                                     rettype.mtype.eletype = fn_type.mtype.restype.eletype
@@ -546,7 +551,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 check_and_assign(fn_type, VoidType())
             else:
                 raise TypeMismatchInStatement(ast)
-        
+
     def visitDowhile(self, ast, param):
         self.infer_type(ast.exp, BoolType(), param)
         exp = ast.exp.accept(self, param)
@@ -555,7 +560,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             raise TypeMismatchInStatement(ast)
         new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))
         for stmt in ast.sl[1]:
-            stmt.accept(self, new_env)  
+            stmt.accept(self, new_env)
 
     def visitWhile(self, ast, param):
         self.infer_type(ast.exp, BoolType(), param)
@@ -563,19 +568,19 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         check_and_assign(exp, BoolType())
         if get_type(exp) is not BoolType:
             raise TypeMismatchInStatement(ast)
-        new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))   
+        new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))
         for stmt in ast.sl[1]:
-            stmt.accept(self, new_env)  
-    
+            stmt.accept(self, new_env)
+
     def visitIntLiteral(self, ast, param):
         return IntType()
-    
+
     def visitFloatLiteral(self, ast, param):
         return FloatType()
-    
+
     def visitBooleanLiteral(self, ast, param):
         return BoolType()
-    
+
     def visitStringLiteral(self, ast, param):
         return StringType()
 
@@ -608,9 +613,3 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         else:
             prime = 'VoidType()'
         return prime
-    
-        
-
-
-
-        

@@ -85,7 +85,7 @@ class FunctionNotReturn(StaticError):
     name: str
 
     def __str__(self):
-        return "str(FunctionNotReturn(" + self.name + '))'
+        return "str(FunctionNotReturn('" + self.name + '\'))'
 
 @dataclass
 class UnreachableFunction(StaticError):

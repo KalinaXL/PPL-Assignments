@@ -336,7 +336,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             for i, idx in enumerate(ast.idx):
                 try:
                     idx_value = idx.accept(self, param)
-                    if (idx_value < 0 or idx_value >= dims[i]) and dims[i] != -1:
+                    if type(idx_value) is not int:
+                        raise NotAConstant()
+                    if idx_value < 0 or (idx_value >= dims[i] and dims[i] != -1):
                         raise IndexOutOfRange(ast)
                 except NotAConstant:
                     pass
@@ -404,16 +406,13 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             right_type = ast.rhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
-        left_type = ast.lhs.accept(self, param)
+        try:
+            left_type = ast.lhs.accept(self, param)
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
         if get_type(left_type) is VoidType:
             raise TypeMismatchInStatement(ast)
         if type(ast.lhs) is ArrayCell:
-            # if get_type(left_type) is Unknown:
-                # if type()
-                # if get_type(right_type) not in [Unknown, ArrayType]:
-                # pre_idx = ast.lhs.arr.accept(self, param)
-                # check_and_assign(pre_idx, right_type, True)
-                # return
             if get_type(left_type) is Unknown:
                 if get_type(right_type) not in [Unknown, ArrayType]:
                     pre_idx = ast.lhs.arr.accept(self, param)
@@ -555,7 +554,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         if type(tp) is ArrayType:
                             raise TypeMismatchInStatement(ast)
                         else:
-                            check_and_assign(arr.accept(self, param), tp)
+                            check_and_assign(arr.accept(self, param), tp, True)
             else:
                 if type(rettype) is Symbol:
                     if type(rettype.mtype) is MType:
@@ -590,7 +589,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                             if type(rettype.mtype.eletype) is Unknown:
                                 if type(fn_type.mtype.restype.eletype) is Unknown:
                                     raise TypeCannotBeInferred(ast)
-                                elif fn_type.mtype.restype.dimen and fn_type.mtype.restype.dimen[-1] == -1:
+                                else:
+                                    rettype.mtype.eletype = fn_type.mtype.restype.eletype
+                                if fn_type.mtype.restype.dimen and fn_type.mtype.restype.dimen[-1] == -1:
                                     fn_type.mtype.restype.dimen = rettype.mtype.dimen
                                 else:
                                     rettype.mtype.eletype = fn_type.mtype.restype.eletype

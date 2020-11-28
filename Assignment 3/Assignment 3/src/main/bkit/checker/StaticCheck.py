@@ -106,7 +106,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         var_envs = reduce(lambda env, ele: ele.accept(self, env), var_decls, (self.global_envi, []))
         self.pre_visit_fn(func_decls, var_envs)
         func_envs = reduce(lambda env, ele: ele.accept(self, env), func_decls, var_envs)
-        if not any(x.name == 'main' for x in func_envs[0]):
+        if not any(x.name == 'main' for x in func_envs[0] if type(x.mtype) is MType):
             raise NoEntryPoint()
         # self.first_iter = False
         # reduce(lambda env, ele: ele.accept(self, env), func_decls, func_envs)
@@ -355,7 +355,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             left_type = ast.lhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
-        if get_type(left_type) is VoidType:
+        if get_type(left_type) is VoidType or get_type(right_type) is VoidType:
             raise TypeMismatchInStatement(ast)
         if type(ast.lhs) is ArrayCell:
             # if get_type(left_type) is Unknown:
@@ -487,6 +487,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         else:
                             check_and_assign(arr.accept(self, param), tp, True)
             else:
+                if get_type(rettype) is VoidType:
+                    raise TypeMismatchInStatement(ast)
                 if type(rettype) is Symbol:
                     if type(rettype.mtype) is MType:
                         if type(rettype.mtype.restype) is ArrayType and type(fn_type.mtype.restype) is ArrayType:
@@ -549,7 +551,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         else:
             if get_type(fn_type) is Unknown:
                 check_and_assign(fn_type, VoidType())
-            else:
+            elif get_type(fn_type) is not VoidType:
                 raise TypeMismatchInStatement(ast)
 
     def visitDowhile(self, ast, param):

@@ -92,6 +92,7 @@ Symbol("printStr",MType([StringType()],VoidType())),
 Symbol("printStrLn",MType([StringType()],VoidType()))]   
 
         self.current_fn = None
+        self.fn_returntype = None
         self.fn_called = set()
         self.fn_decls = set()
         self.in_loop_counter = 0
@@ -115,7 +116,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         var_envs = reduce(lambda env, ele: ele.accept(self, env), var_decls, (self.global_envi, []))
         self.pre_visit_fn(func_decls, var_envs)
         func_envs = reduce(lambda env, ele: ele.accept(self, env), func_decls, var_envs)
-        if not any(x.name == 'main' for x in func_envs[0]):
+        if not any(x.name == 'main' for x in func_envs[0] if type(x.mtype) is MType):
             raise NoEntryPoint()
         residual_fns = self.fn_decls - self.fn_called - {'main'}
         if len(residual_fns) > 0:
@@ -141,25 +142,30 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         fns = list(filter(lambda x: x.name == ast.name.name, param[0]))
         if len(fns) > 1:
             raise Redeclared(Function(), ast.name.name)
-
         var_decl_env = reduce(lambda env, ele: ele.accept(self, env), ast.body[0], (fns[0].mtype.intype, []))
         new_env = (var_decl_env[0], var_decl_env[1] + 
                                     param[0] + param[1])
         # reduce(lambda env, ele: ele.accept(self, env), ast.body[1], new_env)
         self.current_fn = ast.name.name
         self.fn_decls.add(ast.name.name)
-        v, counter = None, 0
+        v, counter, has_return = None, 0, False
+        self.fn_returntype = fns[0].mtype.restype
         for stmt in ast.body[1]:
             v = stmt.accept(self, new_env)
             if counter == 1:
                 raise UnreachableStatement(stmt)
-            elif v in [StaticChecker.RETURN, StaticChecker.BREAK, StaticChecker.CONTINUE]:
+            elif v == StaticChecker.RETURN: 
+                counter += 1
+                has_return = True
+            elif v in [StaticChecker.BREAK, StaticChecker.CONTINUE]:
                 counter += 1
         intypes = [x.mtype for x in fns[0].mtype.intype]
         intypes = [eval(self.primetype2str(tp)) if type(tp) is not ArrayType else eval(self.arraytype2str(tp)) for tp in intypes]
         fns[0].mtype.intype = intypes
         if type(fns[0].mtype.restype) is Unknown:
             fns[0].mtype.restype = VoidType()
+        elif type(fns[0].mtype.restype) is not VoidType and not has_return:
+            raise FunctionNotReturn(ast.name.name)
         # print(fns[0])
         return param
 
@@ -410,7 +416,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             left_type = ast.lhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
-        if get_type(left_type) is VoidType:
+        if get_type(left_type) is VoidType or get_type(right_type) is VoidType:
             raise TypeMismatchInStatement(ast)
         if type(ast.lhs) is ArrayCell:
             if get_type(left_type) is Unknown:
@@ -453,22 +459,33 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             if get_type(cond_type) is not BoolType:
                 raise TypeMismatchInStatement(ast)
             new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
-            v, counter = None, 0
+            v, counter, has_return = None, 0, False
             for stmt in stmts:
                 v = stmt.accept(self, new_env)
                 if counter == 1:
                     raise UnreachableStatement(stmt)
-                elif v in [StaticChecker.RETURN, StaticChecker.CONTINUE, StaticChecker.BREAK]:
+                elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK]:
                     counter += 1
+                elif v == StaticChecker.RETURN:
+                    counter += 1
+                    has_return = True
+            if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return:
+                raise FunctionNotReturn(self.current_fn)
         var_decls, stmts = ast.elseStmt
         new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
-        v, counter = None, 0
+        v, counter, has_return = None, 0, False
         for stmt in stmts:
             v = stmt.accept(self, new_env)
             if counter == 1:
                 raise UnreachableStatement(stmt)
-            elif v in [StaticChecker.RETURN, StaticChecker.CONTINUE, StaticChecker.BREAK]:
+            elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK]:
+                    counter += 1
+            elif v == StaticChecker.RETURN:
                 counter += 1
+                has_return = True
+        if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return and (len(var_decls) + len(stmts)):
+            raise FunctionNotReturn(self.current_fn)
+        
             
     def visitFor(self, ast, param):
         self.in_loop_counter += 1
@@ -556,6 +573,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         else:
                             check_and_assign(arr.accept(self, param), tp, True)
             else:
+                if get_type(rettype) is VoidType:
+                    raise TypeMismatchInStatement(ast)
                 if type(rettype) is Symbol:
                     if type(rettype.mtype) is MType:
                         if type(rettype.mtype.restype) is ArrayType and type(fn_type.mtype.restype) is ArrayType:
@@ -618,8 +637,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         else:
             if get_type(fn_type) is Unknown:
                 check_and_assign(fn_type, VoidType())
-            else:
-                raise FunctionNotReturn(self.current_fn)
+            elif get_type(fn_type) is not VoidType:
+                raise TypeMismatchInStatement(ast)
+        self.fn_returntype = fn_type.mtype.restype
         return StaticChecker.RETURN
     def visitDowhile(self, ast, param):
         self.in_loop_counter += 1

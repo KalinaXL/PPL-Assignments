@@ -75,6 +75,9 @@ class StaticChecker(BaseVisitor):
     BREAK = -3
     CONTINUE = -2
     RETURN = -1
+
+    ALL_RETURN = -4
+    ALL_BRKCNT = -5
     def __init__(self,ast):
         self.ast = ast
         self.global_envi = [
@@ -159,6 +162,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 has_return = True
             elif v in [StaticChecker.BREAK, StaticChecker.CONTINUE]:
                 counter += 1
+            elif type(stmt) is If and v == StaticChecker.ALL_RETURN:
+                counter += 1
+                has_return = True
         intypes = [x.mtype for x in fns[0].mtype.intype]
         intypes = [eval(self.primetype2str(tp)) if type(tp) is not ArrayType else eval(self.arraytype2str(tp)) for tp in intypes]
         fns[0].mtype.intype = intypes
@@ -452,6 +458,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             check_and_assign(right_type, left_tp)
     
     def visitIf(self, ast, param):
+        return_counter = 0
+        jump_counter = 0
         for cond_exp, var_decls, stmts in ast.ifthenStmt:
             self.infer_type(cond_exp, BoolType(), param)
             cond_type = cond_exp.accept(self, param)
@@ -459,32 +467,44 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             if get_type(cond_type) is not BoolType:
                 raise TypeMismatchInStatement(ast)
             new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
-            v, counter, has_return = None, 0, False
+            v, counter = None, 0
             for stmt in stmts:
                 v = stmt.accept(self, new_env)
                 if counter == 1:
                     raise UnreachableStatement(stmt)
-                elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK]:
+                elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK, StaticChecker.RETURN]:
                     counter += 1
-                elif v == StaticChecker.RETURN:
-                    counter += 1
-                    has_return = True
-            if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return:
-                raise FunctionNotReturn(self.current_fn)
+                    jump_counter += 1
+                    if v == StaticChecker.RETURN:
+                        return_counter += 1
+                elif type(stmt) is If:
+                    if v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
+                        counter += 1
+                        jump_counter += 1
+                        if v == StaticChecker.ALL_RETURN:
+                            return_counter += 1
+            # if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return:
+            #     raise FunctionNotReturn(self.current_fn)
         var_decls, stmts = ast.elseStmt
         new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
-        v, counter, has_return = None, 0, False
+        v, counter = None, 0
         for stmt in stmts:
             v = stmt.accept(self, new_env)
             if counter == 1:
                 raise UnreachableStatement(stmt)
-            elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK]:
-                    counter += 1
-            elif v == StaticChecker.RETURN:
+            elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK, StaticChecker.RETURN]:
                 counter += 1
-                has_return = True
-        if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return and (len(var_decls) + len(stmts)):
-            raise FunctionNotReturn(self.current_fn)
+                jump_counter += 1
+                if v == StaticChecker.RETURN:
+                    return_counter += 1
+        if len(stmts):
+            if return_counter == len(ast.ifthenStmt) + 1:
+                return StaticChecker.ALL_RETURN
+            elif self.in_loop_counter and jump_counter == len(ast.ifthenStmt) + 1:
+                return StaticChecker.ALL_BRKCNT
+        return
+        # if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return and (len(var_decls) + len(stmts)):
+        #     raise FunctionNotReturn(self.current_fn)
         
             
     def visitFor(self, ast, param):
@@ -515,6 +535,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             if counter == 1:
                 raise UnreachableStatement(stmt)
             elif v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                counter += 1
+            elif type(stmt) is If and v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
                 counter += 1
         self.in_loop_counter -= 1
     
@@ -643,11 +665,6 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         return StaticChecker.RETURN
     def visitDowhile(self, ast, param):
         self.in_loop_counter += 1
-        self.infer_type(ast.exp, BoolType(), param)
-        exp = ast.exp.accept(self, param)
-        check_and_assign(exp, BoolType())
-        if get_type(exp) is not BoolType:
-            raise TypeMismatchInStatement(ast)
         new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))
         v, counter = None, 0
         for stmt in ast.sl[1]:
@@ -656,6 +673,13 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 raise UnreachableStatement(stmt)
             elif v in [StaticChecker.RETURN, StaticChecker.BREAK, StaticChecker.CONTINUE]:
                 counter += 1
+            elif type(stmt) is If and v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
+                counter += 1
+        self.infer_type(ast.exp, BoolType(), param)
+        exp = ast.exp.accept(self, param)
+        check_and_assign(exp, BoolType())
+        if get_type(exp) is not BoolType:
+            raise TypeMismatchInStatement(ast)
         self.in_loop_counter -= 1
 
     def visitWhile(self, ast, param):
@@ -672,6 +696,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             if counter == 1:
                 raise UnreachableStatement(stmt)
             elif v in [StaticChecker.BREAK, StaticChecker.RETURN, StaticChecker.CONTINUE]:
+                counter += 1
+            elif type(stmt) is If and v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
                 counter += 1
         self.in_loop_counter -= 1
     

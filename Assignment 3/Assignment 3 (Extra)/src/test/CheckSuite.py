@@ -426,18 +426,19 @@ class CheckSuite(unittest.TestCase):
             test();
         EndBody.
         """
-        expect = str(TypeMismatchInStatement(Assign(ArrayCell(Id('b'),[IntLiteral(0),IntLiteral(0)]),StringLiteral("""s"""))))
+        expect = str(TypeCannotBeInferred(Assign(ArrayCell(CallExpr(Id('func'),[]),[IntLiteral(2),IntLiteral(1)]),IntLiteral(14))))
         self.assertTrue(TestChecker.test(input, expect, 430))
     def test_case_32(self):
         input = """
         Var: a, b[4][2], c;
+        Function: func
+        Body:
+            b[0][1] = 2;
+            Return b;
+        EndBody.
         Function: test
         Body:
             func()[2][1] = 14;
-        EndBody.
-        Function: func
-        Body:
-            Return b;
         EndBody.
         Function: main
         Body:
@@ -452,13 +453,14 @@ class CheckSuite(unittest.TestCase):
     def test_case_33(self):
         input = """
         Var: a, b[4][12], c;
+        Function: func
+        Body:
+            b[3][0] = 123;
+            Return b;
+        EndBody.
         Function: test
         Body:
             func()[2][1] = 14;
-        EndBody.
-        Function: func
-        Body:
-            Return b;
         EndBody.
         Function: main
         Body:
@@ -528,7 +530,7 @@ class CheckSuite(unittest.TestCase):
             Else
                 Return b[0][2 + 9];
             EndIf.
-            Return foo()[2-3][1];
+            Return foo()[2][1];
         EndBody.
         Function: main
         Body:
@@ -540,11 +542,16 @@ class CheckSuite(unittest.TestCase):
             Return c;
         EndBody.
         """
-        expect = str(IndexOutOfRange(ArrayCell(CallExpr(Id('foo'),[]),[BinaryOp('-',IntLiteral(2),IntLiteral(3)),IntLiteral(1)])))
+        expect = str(TypeCannotBeInferred(ArrayCell(CallExpr(Id('foo'),[]),[IntLiteral(2),IntLiteral(1)])))
         self.assertTrue(TestChecker.test(input, expect, 436))
     def test_case_38(self):
         input = """
         Var: a, b[2][12], c[2][12];
+        Function: foo
+        Body:
+            c[0][1] = "s";
+            Return c;
+        EndBody.
         Function: f
         Body:
             Var: flag, c;
@@ -553,42 +560,40 @@ class CheckSuite(unittest.TestCase):
             ElseIf c Then
                 Return b[0][2 + 9];
             EndIf.
-            Return foo()[2+3][1]; ** need to infer the first dimension of value returned by foo function which is more than 5?**
+            Return foo()[2+3][1]; 
         EndBody.
         Function: main
         Body:
            a = f();
         EndBody.
-        Function: foo
-        Body:
-            Return c;
-        EndBody.
+       
         Function: t
         Body:
             c[0][11] = "string";
         EndBody.
         """
-        expect = str(TypeMismatchInStatement(Assign(ArrayCell(Id('c'),[IntLiteral(0),IntLiteral(11)]),StringLiteral("""string"""))))
+        expect = str(IndexOutOfRange(ArrayCell(CallExpr(Id('foo'),[]),[BinaryOp('+',IntLiteral(2),IntLiteral(3)),IntLiteral(1)])))
         self.assertTrue(TestChecker.test(input, expect, 437))
     def test_case_39(self):
         input = """
         Var: a, b[2][4][2];
+        Function: f
+        Body:
+            b[0][0][0] = 22;
+            Return b;
+        EndBody.
         Function: main
         Body:
            f()[2][3][3] = 123;
            a = test(f()[0][0][1]) \ 9 ;
         EndBody.
-        Function: f
-        Body:
-            Return b;
-        EndBody.
         Function: test
         Parameter: k
         Body:
-            Return k * f()[0][2][3];
+            Return k * f()[0][2][1];
         EndBody.
         """
-        expect = str(IndexOutOfRange(ArrayCell(CallExpr(Id('f'),[]),[IntLiteral(0),IntLiteral(2),IntLiteral(3)])))
+        expect = str(IndexOutOfRange(ArrayCell(CallExpr(Id('f'),[]),[IntLiteral(2),IntLiteral(3),IntLiteral(3)])))
         self.assertTrue(TestChecker.test(input, expect, 438))
     def test_case_40(self):
         input = """
@@ -1037,11 +1042,11 @@ class CheckSuite(unittest.TestCase):
         EndBody.
         Function: get_arr
         Body:
-            Var: arr = {0, 1, 2, 3, 4, 5, 6};
+            Var: arr = {1, 2, 3, 4, 5};
             Return arr;
         EndBody.
         """
-        expect = str(TypeMismatchInStatement(Return(Id('arr'))))
+        expect = str(TypeCannotBeInferred(Assign(Id('arr'),CallExpr(Id('get_arr'),[]))))
         self.assertTrue(TestChecker.test(input,expect,458))
     def test_case_60(self):
         input = """
@@ -1064,3 +1069,306 @@ class CheckSuite(unittest.TestCase):
         """
         expect = str(TypeCannotBeInferred(Assign(Id('v'),CallExpr(Id('f'),[Id('flag')]))))
         self.assertTrue(TestChecker.test(input,expect,459))
+    def test_case_61(self):
+        input = """
+        Var: x[10];
+        Function: main
+        Parameter: flag
+        Body:
+            Var: s;
+            s = read();
+            For(flag = 0, flag < length(s), 1) Do
+                x[s] = x[s] + 1;
+            EndFor.
+        EndBody.
+        Function: length
+        Parameter: s
+        Body:
+            Return 100;
+        EndBody.
+        """
+        expect = str(TypeMismatchInExpression(ArrayCell(Id('x'),[Id('s')])))
+        self.assertTrue(TestChecker.test(input, expect, 460))
+    def test_case_62(self):
+        input = """
+        Var: x[10];
+        Function: main
+        Parameter: flag
+        Body:
+            Var: s, x, y, t;
+            s = read();
+            x = length(s) * 2;
+            t = length(x);
+        EndBody.
+        Function: length
+        Parameter: s
+        Body:
+            Return 100;
+        EndBody.
+        """
+        expect = str(TypeMismatchInExpression(CallExpr(Id('length'),[Id('x')])))
+        self.assertTrue(TestChecker.test(input, expect, 461))
+    def test_case_63(self):
+        input = """
+        Var: x[10];
+        Function: test
+        Parameter: flag
+        Body:
+            Var: s, x, y, t;
+            s = read();
+            x = length(s) * 2;
+            t = length(flag);
+            Return flag;
+        EndBody.
+        Function: length
+        Parameter: s
+        Body:
+            Return 100;
+        EndBody.
+        Function: main
+        Body:
+            Var: z;
+            z = test(x[0]);
+            x[0] = t;
+        EndBody.
+        """
+        expect = str(Undeclared(Identifier(), 't'))
+        self.assertTrue(TestChecker.test(input, expect, 462))
+    def test_case_64(self):
+        input = """
+        Var: x[10];
+        Function: test
+        Parameter: flag
+        Body:
+            Var: s, x, y, t;
+            s = read();
+            x = length(s) * 2;
+            t = length(flag);
+            Return flag;
+        EndBody.
+        Function: length
+        Parameter: s
+        Body:
+            Return 100;
+        EndBody.
+        Function: foo
+        Body:
+            Var: z;
+            z = test(x[0]);
+            x[1] = z;
+        EndBody.
+        """
+        expect = str(NoEntryPoint())
+        self.assertTrue(TestChecker.test(input, expect, 463))
+    def test_case_65(self):
+        input = """
+        Var: x[10];
+        Function: test
+        Parameter: flag
+        Body:
+            Var: s, x, y, t;
+            s = read();
+            x = length(s) * 2;
+            t = length(flag);
+            Return flag;
+        EndBody.
+        Function: length
+        Parameter: s
+        Body:
+            Return 100;
+        EndBody.
+        Function: main
+        Body:
+            Var: z;
+            z = test(x[0]);
+            x[1] = z;
+            printStrLn(string_of_int(length(z)));
+        EndBody.
+        """
+        expect = str()
+        self.assertTrue(TestChecker.test(input, expect, 464))
+    def test_case_66(self):
+        input = """
+        Var: x[10];
+        Function: main
+        Body:
+            Var: y, z;
+            x[2] = x[0o3] || (y > z);
+            While x[2] && x[3] Do
+                Do
+                    printStrLn(string_of_int(y * z));
+                    If x[0] Then
+                        Return 1;
+                    ElseIf x[1] Then
+                        Return z;
+                    Else
+                        Var: k;
+                        k = 10;
+                    EndIf.
+                    z = y;
+                While x[4] EndDo.
+            EndWhile.
+        EndBody.
+        """
+        expect = str(FunctionNotReturn('main'))
+        self.assertTrue(TestChecker.test(input, expect, 465))
+    def test_case_67(self):
+        input = """
+        Var: x[10];
+        Function: foo
+        Parameter: a, b
+        Body:
+            Return x;
+        EndBody.
+        Function: main
+        Body:
+            Var: a[10], t, z;
+            t = 4;
+            a[0] = t;
+            a = foo(t, 4);
+        EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Return(Id('x'))))
+        self.assertTrue(TestChecker.test(input, expect, 466))
+    def test_case_68(self):
+        input = """
+        Var: x[10];
+        Function: foo
+        Parameter: a, b
+        Body:
+            b = x[5] * b % 4;
+            Return x;
+        EndBody.
+        Function: main
+        Body:
+            Var: a[10], t, z;
+            t = 4;
+            a = foo(t, 4);
+            z = foo(a[2], t)[2];
+            a[2] = float_of_int(z);
+        EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(ArrayCell(Id('a'),[IntLiteral(2)]),CallExpr(Id('float_of_int'),[Id('z')]))))
+        self.assertTrue(TestChecker.test(input, expect, 467))
+    def test_case_69(self):
+        input = """
+        Var: x[10];
+        Function: foo
+        Parameter: a, b
+        Body:
+            b = x[5] * b % 4;
+            Return x;
+        EndBody.
+        Function: main
+        Body:
+            Var: a[10], t, z;
+            t = 4;
+            foo(t, t)[2] = a[2];
+            a[int_of_float(4.3 *. 2.4 \. 0.1)] = z || (t > x[1]);
+        EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(ArrayCell(Id('a'),[CallExpr(Id('int_of_float'),[BinaryOp('\.',BinaryOp('*.',FloatLiteral(4.3),FloatLiteral(2.4)),FloatLiteral(0.1))])]),BinaryOp('||',Id('z'),BinaryOp('>',Id('t'),ArrayCell(Id('x'),[IntLiteral(1)]))))))
+        self.assertTrue(TestChecker.test(input, expect, 468))
+    def test_case_70(self):
+        input = """
+        Var: x[10];
+        Function: foo
+        Body:
+            x[2] = 2;
+            Return x;
+        EndBody.
+        Function: main
+        Body:
+            Var: a[10], t, z;
+            a[9] = t * z % x[1];
+            a[2] = foo()[2];
+            foo()[4] = 4.3;
+        EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(ArrayCell(CallExpr(Id('foo'),[]),[IntLiteral(4)]),FloatLiteral(4.3))))
+        self.assertTrue(TestChecker.test(input, expect, 469))
+    def test_case_71(self):
+        input = """
+        Var: x[10];
+        Function: main
+        Body:
+            Var: a[10], t, z;
+            a[9] = t * z;
+            a = foo();
+            foo()[2] = 3.4;
+        EndBody.
+        Function: foo
+        Body:
+            Return x;
+        EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(ArrayCell(CallExpr(Id('foo'),[]),[IntLiteral(2)]),FloatLiteral(3.4))))
+        self.assertTrue(TestChecker.test(input, expect, 470))
+    def test_case_72(self):
+        input = """
+        Var: x[10];
+        Function: main
+        Body:
+            Var: a[10], t, z;
+            a[t] = t +. 2.;
+        EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp('+.',Id('t'),FloatLiteral(2.0))))
+        self.assertTrue(TestChecker.test(input, expect, 471))
+    def test_case_73(self):
+        input = """
+        Function: main
+        Parameter: x
+        Body:
+            Var: y, z;
+            y = x && (x == z);
+        EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp('==',Id('x'),Id('z'))))
+        self.assertTrue(TestChecker.test(input, expect, 472))
+    def test_case_74(self):
+        input = """
+        Var: a[2] = {0, 1};
+        Function: foo
+        Parameter: x
+        Body:
+            Return a;
+        EndBody.
+
+        Function: main
+            Body:
+                foo(0)[0] = foo(0.0)[1 * a[1]]; 
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(CallExpr(Id('foo'),[FloatLiteral(0.0)])))
+        self.assertTrue(TestChecker.test(input, expect, 473))
+    def test_case_75(self):
+        input = """
+        Var: a[2] = {0, 1};
+        Function: foo
+        Parameter: x
+        Body:
+        EndBody.
+
+        Function: main
+            Body:
+                foo(0);
+                foo("a"); 
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(CallStmt(Id('foo'),[StringLiteral("""a""")])))
+        self.assertTrue(TestChecker.test(input, expect, 474))
+    def test_case_76(self):
+        input = """
+        Function: foo
+        Body:
+        EndBody.
+
+        Function: main
+        Parameter: x
+        Body:
+            main(main(foo()));
+        EndBody.
+        """
+        expect = str()
+        self.assertTrue(TestChecker.test(input, expect, 475))

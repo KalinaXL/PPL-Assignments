@@ -172,7 +172,6 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             fns[0].mtype.restype = VoidType()
         elif type(fns[0].mtype.restype) is not VoidType and not has_return:
             raise FunctionNotReturn(ast.name.name)
-        # print(fns[0])
         return param
 
     def infer_type(self, ast, tp, param):
@@ -210,10 +209,10 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         else:
             raise TypeMismatchInExpression(ast)
         self.infer_type(ast.left, in_type(), param)
-        self.infer_type(ast.right, in_type(), param)
         left_exp = ast.left.accept(self, param)
-        right_exp = ast.right.accept(self, param)
         check_and_assign(left_exp, in_type())
+        self.infer_type(ast.right, in_type(), param)
+        right_exp = ast.right.accept(self, param)
         check_and_assign(right_exp, in_type())
         if get_type(left_exp) is in_type and get_type(right_exp) is in_type:
                 return out_type()
@@ -258,15 +257,16 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if len(fn.mtype.intype) != len(ast.param):
             raise TypeMismatchInExpression(ast)
         else:
-            for tp, pr in zip(fn.mtype.intype, ast.param):
+            for i, (tp, pr) in enumerate(zip(fn.mtype.intype, ast.param)):
                 par = pr.accept(self, param)
                 if get_type(tp) is Unknown:
                     if get_type(par) is Unknown:
                         raise TypeCannotBeInferred(ast)
                     else:
                         par_tp = par.mtype if type(par) is Symbol else par
+                        if type(tp) is Unknown:
+                            fn.mtype.intype[i] = par_tp
                         check_and_assign(tp, par_tp)
-                        # fn.mtype.intype[i] = par_tp
                 else:
                     if get_type(par) is Unknown:
                         if type(tp) is Symbol:
@@ -295,13 +295,15 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if len(fn.mtype.intype) != len(ast.param):
             raise TypeMismatchInStatement(ast)
         else:
-            for tp, pr in zip(fn.mtype.intype, ast.param):
+            for i, (tp, pr) in enumerate(zip(fn.mtype.intype, ast.param)):
                 par = pr.accept(self, param)
                 if get_type(tp) is Unknown:
                     if get_type(par) is Unknown:
                         raise TypeCannotBeInferred(ast)
                     else:
                         par_tp = par.mtype if type(par) is Symbol else par
+                        if type(tp) is Unknown:
+                            fn.mtype.intype[i] = par_tp
                         check_and_assign(tp, par_tp)
                 else:
                     if get_type(par) is Unknown:
@@ -323,10 +325,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if type(arr) is Symbol:
             if type(arr.mtype) is MType:
                 if type(arr.mtype.restype) is Unknown:
-                    #
-                    # Not Found A Solution
-                    #
-                    arr.mtype.restype = ArrayType([-1] * len(ast.idx), Unknown())
+                    # arr.mtype.restype = ArrayType([-1] * len(ast.idx), Unknown())
+                    raise TypeCannotBeInferred(ast)
                 elif type(arr.mtype.restype) is not ArrayType:
                     raise TypeMismatchInExpression(ast)
             elif type(arr.mtype) is not ArrayType:
@@ -379,15 +379,26 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 raise TypeMismatchInStatement(ast)
         elif type(left) is Symbol and get_type(left) is ArrayType:
             if type(right) is Symbol:
-                if left.mtype.dimen != right.mtype.dimen:
-                    raise TypeMismatchInStatement(ast)
-                elif type(left.mtype.eletype) is Unknown:
-                    if type(right.mtype.eletype) is Unknown:
-                        raise TypeCannotBeInferred(ast)
-                    else:
-                        left.mtype.eletype = right.mtype.eletype
-                elif type(left.mtype.eletype) != type(right.mtype.eletype):
-                    raise TypeMismatchInStatement(ast)
+                if type(right.mtype) is not MType:
+                    if left.mtype.dimen != right.mtype.dimen:
+                        raise TypeMismatchInStatement(ast)
+                    elif type(left.mtype.eletype) is Unknown:
+                        if type(right.mtype.eletype) is Unknown:
+                            raise TypeCannotBeInferred(ast)
+                        else:
+                            left.mtype.eletype = right.mtype.eletype
+                    elif type(left.mtype.eletype) != type(right.mtype.eletype):
+                        raise TypeMismatchInStatement(ast)
+                else:
+                    if left.mtype.dimen != right.mtype.restype.dimen:
+                        raise TypeMismatchInStatement(ast)
+                    elif type(left.mtype.eletype) is Unknown:
+                        if type(right.mtype.restype.eletype) is Unknown:
+                            raise TypeCannotBeInferred(ast)
+                        else:
+                            left.mtype.eletype = right.mtype.restype.eletype
+                    elif type(left.mtype.eletype) != type(right.mtype.restype.eletype):
+                        raise TypeMismatchInStatement(ast)
             else:
                 if left.mtype.dimen != right.dimen:
                     raise TypeMismatchInStatement(ast)
@@ -415,11 +426,11 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
 
     def visitAssign(self, ast, param):
         try:
-            right_type = ast.rhs.accept(self, param)
+            left_type = ast.lhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
         try:
-            left_type = ast.lhs.accept(self, param)
+            right_type = ast.rhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
         if get_type(left_type) is VoidType or get_type(right_type) is VoidType:
@@ -432,9 +443,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                     return
             elif get_type(right_type) is ArrayType:
                 raise TypeMismatchInStatement(ast)
-
         elif type(ast.lhs) is not Id:
             raise TypeMismatchInStatement(ast)
+        
         if get_type(left_type) is not Unknown and get_type(right_type) is not Unknown:
             if get_type(left_type) == get_type(right_type):
                 self.handle_assign_equal_type(ast, left_type, right_type)
@@ -449,13 +460,23 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 raise TypeMismatchInStatement(ast)
         elif get_type(right_type) is Unknown and get_type(left_type) is not Unknown:
             if type(left_type) is Symbol:
-                if type(left_type.mtype) is MType:
-                    left_tp = left_type.mtype.restype
-                else:
-                    left_tp = left_type.mtype
+                left_tp = left_type.mtype
             else:
                 left_tp = left_type
-            check_and_assign(right_type, left_tp)
+            if type(ast.rhs) is ArrayCell:
+                # if get_type(left_type) is Unknown:
+                #     if get_type(right_type) not in [Unknown, ArrayType]:
+                #         pre_idx = ast.lhs.arr.accept(self, param)
+                #         check_and_assign(pre_idx, get_type(right_type)(), True)
+                #         return
+                # elif get_type(right_type) is ArrayType:
+                #     raise TypeMismatchInStatement(ast)  
+                check_and_assign(ast.rhs.arr.accept(self, param), left_tp, True)
+            else:
+                if type(left_tp) is ArrayType:
+                    if type(left_tp.eletype) is Unknown:
+                        raise TypeCannotBeInferred(ast)
+                check_and_assign(right_type, left_tp)
     
     def visitIf(self, ast, param):
         return_counter = 0
@@ -509,21 +530,24 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             
     def visitFor(self, ast, param):
         self.in_loop_counter += 1
-        self.infer_type(ast.expr1, IntType(), param)
-        exp1_type = ast.expr1.accept(self, param)
-        check_and_assign(exp1_type, IntType())
-        if get_type(exp1_type) is not IntType:
-            raise TypeMismatchInStatement(ast)
         idx = ast.idx1.accept(self, param)
         if get_type(idx.mtype) is Unknown:
             idx.mtype = IntType()
         elif get_type(idx.mtype) is not IntType:
             raise TypeMismatchInStatement(ast)
+
+        self.infer_type(ast.expr1, IntType(), param)
+        exp1_type = ast.expr1.accept(self, param)
+        check_and_assign(exp1_type, IntType())
+        if get_type(exp1_type) is not IntType:
+            raise TypeMismatchInStatement(ast)
+
         self.infer_type(ast.expr2, BoolType(), param)
-        self.infer_type(ast.expr3, IntType(), param)
         exp2_type = ast.expr2.accept(self, param)
-        exp3_type = ast.expr3.accept(self, param)
         check_and_assign(exp2_type, BoolType())
+
+        self.infer_type(ast.expr3, IntType(), param)
+        exp3_type = ast.expr3.accept(self, param)
         check_and_assign(exp3_type, IntType())
         if get_type(exp2_type) is not BoolType or get_type(exp3_type) is not IntType:
             raise TypeMismatchInStatement(ast)
@@ -739,6 +763,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             prime = 'BoolType()'
         elif type(tp) is FloatType:
             prime = 'FloatType()'
+        elif type(tp) is StringType:
+            prime = 'StringType()'
         elif type(tp) is Unknown:
             prime = 'Unknown()'
         else:

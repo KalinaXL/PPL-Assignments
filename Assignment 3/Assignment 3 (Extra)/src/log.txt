@@ -1,0 +1,24 @@
+RESULT: str(Undeclared(Identifier(), 'foo'))
+EXPECT: str(TypeCannotBeInferred(Assign(Id('e'),CallExpr(Id('main'),[Id('b'),CallExpr(Id('main'),[Id('d'),Id('a'),Id('c')]),BinaryOp('+',Id('a'),Id('d'))]))))
+Tests run  4
+Errors  []
+[(<CheckSuite.CheckSuite testMethod=test_case_107>,
+  'Traceback (most recent call last):\n'
+  '  File "./test/CheckSuite.py", line 1977, in test_case_107\n'
+  '    self.assertTrue(TestChecker.test(input, expect, 505))\n'
+  'AssertionError: False is not true\n')]
+Test output
+ ...F
+======================================================================
+FAIL: test_case_107 (CheckSuite.CheckSuite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "./test/CheckSuite.py", line 1977, in test_case_107
+    self.assertTrue(TestChecker.test(input, expect, 505))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.117s
+
+FAILED (failures=1)
+

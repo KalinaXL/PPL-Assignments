@@ -60,7 +60,7 @@ def check_and_assign(obj, tp, force_casttype = False, dims = None):
         elif type(obj.mtype) is MType:
             if type(obj.mtype.restype) is Unknown:
                 if force_casttype and dims:
-                    obj.mtype.restype = ArrayType(dims, tp)
+                    raise TypeCannotBeInferred(None)
                 else:
                     obj.mtype.restype = tp
             elif force_casttype and type(obj.mtype.restype) is ArrayType and type(obj.mtype.restype.eletype) is Unknown:
@@ -68,7 +68,16 @@ def check_and_assign(obj, tp, force_casttype = False, dims = None):
         elif force_casttype and type(obj.mtype) is ArrayType and type(obj.mtype.eletype) is Unknown:
             obj.mtype.eletype = tp
 
+class NotAConstant(Exception):
+    pass
+
 class StaticChecker(BaseVisitor):
+    BREAK = -3
+    CONTINUE = -2
+    RETURN = -1
+
+    ALL_RETURN = -4
+    ALL_BRKCNT = -5
     def __init__(self,ast):
         self.ast = ast
         self.global_envi = [
@@ -86,7 +95,13 @@ Symbol("printStr",MType([StringType()],VoidType())),
 Symbol("printStrLn",MType([StringType()],VoidType()))]
 
         self.current_fn = None
+        self.fn_returntype = None
+        self.fn_called = set()
         self.fn_decls = set()
+        self.in_loop_counter = 0
+        self.has_oor = False
+        self.oor_counter = 0
+        self.oor_flag = 0
 
     def check(self):
         return self.visit(self.ast,self.global_envi)
@@ -108,6 +123,10 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         func_envs = reduce(lambda env, ele: ele.accept(self, env), func_decls, var_envs)
         if not any(x.name == 'main' for x in func_envs[0] if type(x.mtype) is MType):
             raise NoEntryPoint()
+        residual_fns = self.fn_decls - self.fn_called - {'main'}
+        if len(residual_fns) > 0:
+            for fn_name in residual_fns:
+                raise UnreachableFunction(fn_name)
         # self.first_iter = False
         # reduce(lambda env, ele: ele.accept(self, env), func_decls, func_envs)
         # # reduce(lambda env, ele: ele.accept(self, env), ast.decl + ast.decl, (self.global_envi, []))
@@ -128,31 +147,52 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         fns = list(filter(lambda x: x.name == ast.name.name, param[0]))
         if len(fns) > 1:
             raise Redeclared(Function(), ast.name.name)
-
         var_decl_env = reduce(lambda env, ele: ele.accept(self, env), ast.body[0], (fns[0].mtype.intype, []))
         new_env = (var_decl_env[0], var_decl_env[1] +
                                     param[0] + param[1])
         # reduce(lambda env, ele: ele.accept(self, env), ast.body[1], new_env)
         self.current_fn = ast.name.name
         self.fn_decls.add(ast.name.name)
-
+        v, counter, has_return = None, 0, False
+        self.fn_returntype = fns[0].mtype.restype
         for stmt in ast.body[1]:
-            stmt.accept(self, new_env)
-
-        intypes = [x.mtype for x in fns[0].mtype.intype]
-        intypes = [eval(self.primetype2str(tp)) if type(tp) is not ArrayType else eval(self.arraytype2str(tp)) for tp in intypes]
-        fns[0].mtype.intype = intypes
+            v = stmt.accept(self, new_env)
+            if counter == 1:
+                raise UnreachableStatement(stmt)
+            elif v == StaticChecker.RETURN:
+                counter += 1
+                has_return = True
+            elif v in [StaticChecker.BREAK, StaticChecker.CONTINUE]:
+                counter += 1
+            elif type(stmt) is If and v == StaticChecker.ALL_RETURN:
+                counter += 1
+                has_return = True
+        # intypes = [x.mtype for x in fns[0].mtype.intype]
+        # intypes = [eval(self.primetype2str(tp)) if type(tp) is not ArrayType else eval(self.arraytype2str(tp)) for tp in intypes]
+        # fns[0].mtype.intype = intypes
         if type(fns[0].mtype.restype) is Unknown:
             fns[0].mtype.restype = VoidType()
-        # print(fns[0])
+        elif type(fns[0].mtype.restype) is not VoidType and not has_return:
+            raise FunctionNotReturn(ast.name.name)
         return param
 
     def infer_type(self, ast, tp, param):
         if type(ast) is ArrayCell and type(tp) is not ArrayType:
             check_and_assign(ast.arr.accept(self, param), tp, True, [-1] * len(ast.idx))
+    def eval_exp_value(self, op, left, right = None):
+        if op == '\\':
+            op = '//'
+        return eval(f'{left} {op} {right}' if right else f'{op} {left}')
     def visitBinaryOp(self, ast, param):
-        left_exp = ast.left.accept(self, param)
-        right_exp = ast.right.accept(self, param)
+        if self.has_oor:
+            left_exp = ast.left.accept(self, param)
+            right_exp = ast.right.accept(self, param)
+            if type(left_exp) is not int or type(right_exp) is not int:
+                raise NotAConstant()
+            try:
+                return self.eval_exp_value(ast.op, left_exp, right_exp)
+            except:
+                raise NotAConstant()
         if ast.op in ['&&', '||']:
             in_type = BoolType
             out_type = BoolType
@@ -171,16 +211,26 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         else:
             raise TypeMismatchInExpression(ast)
         self.infer_type(ast.left, in_type(), param)
-        self.infer_type(ast.right, in_type(), param)
         left_exp = ast.left.accept(self, param)
-        right_exp = ast.right.accept(self, param)
         check_and_assign(left_exp, in_type())
+        if get_type(left_exp) is not in_type:
+            raise TypeMismatchInExpression(ast)
+        self.infer_type(ast.right, in_type(), param)
+        right_exp = ast.right.accept(self, param)
         check_and_assign(right_exp, in_type())
-        if get_type(left_exp) is in_type and get_type(right_exp) is in_type:
-                return out_type()
-        raise TypeMismatchInExpression(ast)
+        if get_type(right_exp) is not in_type:
+            raise TypeMismatchInExpression(ast)
+        return out_type()
 
     def visitUnaryOp(self, ast, param):
+        if self.has_oor:
+            exp = ast.body.accept(self, param)
+            if type(exp) is not int:
+                raise NotAConstant()
+            try:
+                return self.eval_exp_value(ast.op, exp)
+            except:
+                raise NotAConstant()
         if ast.op == '!':
             in_type = BoolType
             out_type = BoolType
@@ -195,7 +245,7 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         self.infer_type(ast.body, in_type(), param)
         exp = ast.body.accept(self, param)
         check_and_assign(exp, in_type())
-        if type(exp) is in_type:
+        if get_type(exp) is in_type:
             return out_type()
         raise TypeMismatchInExpression(ast)
 
@@ -204,28 +254,48 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if not func:
             raise Undeclared(Function(), ast.method.name)
         fn = func[0]
+        if self.current_fn != fn.name:
+            self.fn_called.add(fn.name)
         if type(fn.mtype) is not MType:
             raise TypeMismatchInExpression(ast)
         if len(fn.mtype.intype) != len(ast.param):
             raise TypeMismatchInExpression(ast)
         else:
-            for tp, pr in zip(fn.mtype.intype, ast.param):
+            for i, (tp, pr) in enumerate(zip(fn.mtype.intype, ast.param)):
                 par = pr.accept(self, param)
+                if get_type(tp) is not Unknown and get_type(par) is not Unknown:
+                    if get_type(tp) == get_type(par):
+                        self.handle_assign_equal_type(ast, tp, par, False)
+                    else:
+                        raise TypeMismatchInExpression(ast)
                 if get_type(tp) is Unknown:
                     if get_type(par) is Unknown:
                         raise TypeCannotBeInferred(ast)
+                    elif get_type(par) is not ArrayType:
+                        if type(tp) is Unknown:
+                            fn.mtype.intype[i] = get_type(par)()
+                        check_and_assign(tp, get_type(par)())
                     else:
-                        par_tp = par.mtype if type(par) is Symbol else par
-                        check_and_assign(tp, par_tp)
-                        # fn.mtype.intype[i] = par_tp
-                else:
-                    if get_type(par) is Unknown:
-                        if type(tp) is Symbol:
-                            check_and_assign(par, tp.mtype)
-                        else:
-                            check_and_assign(par, tp)
-                    elif get_type(tp) != get_type(par):
+                        #
+                        #   Think ?
+                        #
                         raise TypeMismatchInExpression(ast)
+                elif get_type(par) is Unknown and get_type(tp) is not Unknown:
+                    if type(tp) is Symbol and type(tp.mtype) is ArrayType:
+                        if type(tp.mtype.eletype) is Unknown:
+                            raise TypeCannotBeInferred(ast)
+                        if type(par.mtype) is MType:
+                            par.mtype.restype = tp.mtype
+                        else:
+                            raise TypeMismatchInExpression(ast)
+                    if type(pr) is ArrayCell:
+                        check_and_assign(pr.arr.accept(self, param), get_type(tp)(), True)
+                    else:
+                        if get_type(tp) is not ArrayType:
+                            check_and_assign(par, get_type(tp)())
+                if get_type(par) is VoidType:
+                    raise TypeMismatchInExpression(ast)
+                
         return fn
 
     def visitCallStmt(self, ast, param):
@@ -233,6 +303,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if not func:
             raise Undeclared(Function(), ast.method.name)
         fn = func[0]
+        if self.current_fn != fn.name:
+            self.fn_called.add(fn.name)
         if type(fn.mtype) is not MType:
             raise TypeMismatchInStatement(ast)
 
@@ -244,25 +316,46 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if len(fn.mtype.intype) != len(ast.param):
             raise TypeMismatchInStatement(ast)
         else:
-            for tp, pr in zip(fn.mtype.intype, ast.param):
-                par = pr.accept(self, param)
+            for i, (tp, pr) in enumerate(zip(fn.mtype.intype, ast.param)):
+                try:
+                    par = pr.accept(self, param)
+                except TypeCannotBeInferred:
+                    raise TypeCannotBeInferred(ast)
+                if get_type(tp) is not Unknown and get_type(par) is not Unknown:
+                    if get_type(tp) == get_type(par):
+                        self.handle_assign_equal_type(ast, tp, par)
+                    else:
+                        raise TypeMismatchInStatement(ast)
                 if get_type(tp) is Unknown:
                     if get_type(par) is Unknown:
                         raise TypeCannotBeInferred(ast)
+                    elif get_type(par) is not ArrayType:
+                        if type(tp) is Unknown:
+                            fn.mtype.intype[i] = get_type(par)()
+                        check_and_assign(tp, get_type(par)())
                     else:
-                        par_tp = par.mtype if type(par) is Symbol else par
-                        check_and_assign(tp, par_tp)
-                else:
-                    if get_type(par) is Unknown:
-                        if type(tp) is Symbol:
-                            check_and_assign(par, tp.mtype)
-                        else:
-                            check_and_assign(par, tp)
-                    elif get_type(tp) != get_type(par):
+                        #
+                        #   Think ?
+                        #
                         raise TypeMismatchInStatement(ast)
+                elif get_type(par) is Unknown and get_type(tp) is not Unknown:
+                    if type(tp) is Symbol and type(tp.mtype) is ArrayType:
+                        if type(tp.mtype.eletype) is Unknown:
+                            raise TypeCannotBeInferred(ast)
+                        if type(par.mtype) is MType:
+                            par.mtype.restype = tp.mtype
+                        else:
+                            raise TypeMismatchInStatement(ast)
+                    if type(pr) is ArrayCell:
+                        check_and_assign(pr.arr.accept(self, param), get_type(tp)(), True)
+                    else:
+                        if get_type(tp) is not ArrayType:
+                            check_and_assign(par, get_type(tp)())
+                if get_type(par) is VoidType:
+                    raise TypeMismatchInStatement(ast)
 
     def visitId(self, ast, param):
-        ids = list(filter(lambda x: ast.name == x.name, param[0] + param[1]))
+        ids = list(filter(lambda x: ast.name == x.name and type(x.mtype) is not MType, param[0] + param[1]))
         if not ids:
             raise Undeclared(Identifier(), ast.name)
         return ids[0]
@@ -272,34 +365,51 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if type(arr) is Symbol:
             if type(arr.mtype) is MType:
                 if type(arr.mtype.restype) is Unknown:
-                    #
-                    # Not Found A Solution
-                    #
-                    arr.mtype.restype = ArrayType([-1] * len(ast.idx), Unknown())
+                    # arr.mtype.restype = ArrayType([-1] * len(ast.idx), Unknown())
+                    raise TypeCannotBeInferred(ast)
                 elif type(arr.mtype.restype) is not ArrayType:
                     raise TypeMismatchInExpression(ast)
             elif type(arr.mtype) is not ArrayType:
                 raise TypeMismatchInExpression(ast)
         else:
             raise TypeMismatchInExpression(ast)
-        for idx in ast.idx:
-            idx_type = idx.accept(self, param)
-            if get_type(idx_type) is Unknown:
-                check_and_assign(idx_type, IntType())
-            if get_type(idx_type) is not IntType:
-                raise TypeMismatchInExpression(ast)
         if type(arr.mtype) is MType:
             dims = arr.mtype.restype.dimen
         else:
             dims = arr.mtype.dimen
         if len(dims) != len(ast.idx):
             raise TypeMismatchInExpression(ast)
+        self.oor_counter += 1
+        self.has_oor = self.oor_counter == self.oor_flag
+        for idx in ast.idx:
+            self.infer_type(idx, IntType(), param)
+            idx_type = idx.accept(self, param)
+            if get_type(idx_type) is Unknown:
+                check_and_assign(idx_type, IntType(), True)
+            if get_type(idx_type) is not IntType:
+                raise TypeMismatchInExpression(ast)
+        self.oor_flag += 1
+        self.has_oor = self.oor_counter == self.oor_flag
+        if self.has_oor:
+            for i, idx in enumerate(ast.idx):
+                try:
+                    idx_value = idx.accept(self, param)
+                    if type(idx_value) is not int:
+                        raise NotAConstant()
+                    if idx_value < 0 or idx_value >= dims[i]:
+                        raise IndexOutOfRange(ast)
+                except NotAConstant:
+                    pass
+        self.has_oor = False
+        self.oor_flag -= 1
+        self.oor_counter -= 1
         return arr.mtype.restype.eletype if type(arr.mtype) is MType else arr.mtype.eletype
 
-    def handle_assign_equal_type(self, ast, left, right):
+    def handle_assign_equal_type(self, ast, left, right, is_stmt = True):
+        error = TypeMismatchInStatement if is_stmt else TypeMismatchInExpression
         if type(left) is ArrayType and type(right) is ArrayType:
             if left.dimen != right.dimen:
-                raise TypeMismatchInStatement(ast)
+                raise error(ast)
             elif type(left.eletype) is Unknown:
                 if type(right.eletype) is Unknown:
                     raise TypeCannotBeInferred(ast)
@@ -309,34 +419,47 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                     # Not Found a solution
                     #
             elif type(left.eletype) != type(right.eletype) and type(right.eletype) is not Unknown:
-                raise TypeMismatchInStatement(ast)
+                raise error(ast)
         elif type(left) is Symbol and get_type(left) is ArrayType:
             if type(right) is Symbol:
-                if left.mtype.dimen != right.mtype.dimen:
-                    raise TypeMismatchInStatement(ast)
-                elif type(left.mtype.eletype) is Unknown:
-                    if type(right.mtype.eletype) is Unknown:
-                        raise TypeCannotBeInferred(ast)
-                    else:
-                        left.mtype.eletype = right.mtype.eletype
-                elif type(left.mtype.eletype) != type(right.mtype.eletype):
-                    raise TypeMismatchInStatement(ast)
+                if type(right.mtype) is not MType:
+                    if left.mtype.dimen != right.mtype.dimen:
+                        raise error(ast)
+                    elif type(left.mtype.eletype) is Unknown:
+                        if type(right.mtype.eletype) is Unknown:
+                            raise TypeCannotBeInferred(ast)
+                        else:
+                            left.mtype.eletype = right.mtype.eletype
+                    elif type(right.mtype.eletype) is Unknown:
+                        right.mtype.eletype = left.mtype.eletype
+                    elif type(left.mtype.eletype) != type(right.mtype.eletype):
+                        raise error(ast)
+                else:
+                    if left.mtype.dimen != right.mtype.restype.dimen:
+                        raise error(ast)
+                    elif type(left.mtype.eletype) is Unknown:
+                        if type(right.mtype.restype.eletype) is Unknown:
+                            raise TypeCannotBeInferred(ast)
+                        else:
+                            left.mtype.eletype = right.mtype.restype.eletype
+                    elif type(left.mtype.eletype) != type(right.mtype.restype.eletype):
+                        raise error(ast)
             else:
                 if left.mtype.dimen != right.dimen:
-                    raise TypeMismatchInStatement(ast)
+                    raise error(ast)
                 elif type(left.mtype.eletype) is Unknown:
                     if type(right.eletype) is Unknown:
                         raise TypeCannotBeInferred(ast)
                     else:
                         left.mtype.eletype = right.eletype
                 elif type(left.mtype.eletype) != type(right.eletype) and type(right.eletype) is not Unknown:
-                    raise TypeMismatchInStatement(ast)
+                    raise error(ast)
         elif type(right) is Symbol and get_type(right) is ArrayType:
             if left.dimen != right.mtype.dimen:
-                raise TypeMismatchInStatement(ast)
+                raise error(ast)
             elif type(left.eletype) is Unknown:
                 if type(right.mtype.eletype) is Unknown:
-                    raise TypeMismatchInStatement(ast)
+                    raise error(ast)
                 else:
                     pass
                     #
@@ -344,26 +467,20 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                     #
                 pass
             elif type(left.eletype) != type(right.mtype.eletype):
-                raise TypeMismatchInStatement(ast)
+                raise error(ast)
 
     def visitAssign(self, ast, param):
         try:
-            right_type = ast.rhs.accept(self, param)
+            left_type = ast.lhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
         try:
-            left_type = ast.lhs.accept(self, param)
+            right_type = ast.rhs.accept(self, param)
         except TypeCannotBeInferred:
             raise TypeCannotBeInferred(ast)
         if get_type(left_type) is VoidType or get_type(right_type) is VoidType:
             raise TypeMismatchInStatement(ast)
         if type(ast.lhs) is ArrayCell:
-            # if get_type(left_type) is Unknown:
-                # if type()
-                # if get_type(right_type) not in [Unknown, ArrayType]:
-                # pre_idx = ast.lhs.arr.accept(self, param)
-                # check_and_assign(pre_idx, right_type, True)
-                # return
             if get_type(left_type) is Unknown:
                 if get_type(right_type) not in [Unknown, ArrayType]:
                     pre_idx = ast.lhs.arr.accept(self, param)
@@ -371,9 +488,9 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                     return
             elif get_type(right_type) is ArrayType:
                 raise TypeMismatchInStatement(ast)
-
         elif type(ast.lhs) is not Id:
             raise TypeMismatchInStatement(ast)
+
         if get_type(left_type) is not Unknown and get_type(right_type) is not Unknown:
             if get_type(left_type) == get_type(right_type):
                 self.handle_assign_equal_type(ast, left_type, right_type)
@@ -388,64 +505,141 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 raise TypeMismatchInStatement(ast)
         elif get_type(right_type) is Unknown and get_type(left_type) is not Unknown:
             if type(left_type) is Symbol:
-                if type(left_type.mtype) is MType:
-                    left_tp = left_type.mtype.restype
-                else:
-                    left_tp = left_type.mtype
+                left_tp = left_type.mtype
             else:
                 left_tp = left_type
-            check_and_assign(right_type, left_tp)
+            if type(ast.rhs) is ArrayCell:
+                # if get_type(left_type) is Unknown:
+                #     if get_type(right_type) not in [Unknown, ArrayType]:
+                #         pre_idx = ast.lhs.arr.accept(self, param)
+                #         check_and_assign(pre_idx, get_type(right_type)(), True)
+                #         return
+                # elif get_type(right_type) is ArrayType:
+                #     raise TypeMismatchInStatement(ast)
+                check_and_assign(ast.rhs.arr.accept(self, param), left_tp, True)
+            else:
+                if type(left_tp) is ArrayType:
+                    if type(left_tp.eletype) is Unknown:
+                        raise TypeCannotBeInferred(ast)
+                check_and_assign(right_type, left_tp)
 
     def visitIf(self, ast, param):
+        return_counter = 0
+        jump_counter = 0
         for cond_exp, var_decls, stmts in ast.ifthenStmt:
-            self.infer_type(cond_exp, BoolType(), param)
-            cond_type = cond_exp.accept(self, param)
-            check_and_assign(cond_type, BoolType())
+            try:
+                self.infer_type(cond_exp, BoolType(), param)
+                cond_type = cond_exp.accept(self, param)
+                check_and_assign(cond_type, BoolType())
+            except TypeCannotBeInferred:
+                raise TypeCannotBeInferred(ast)
             if get_type(cond_type) is not BoolType:
                 raise TypeMismatchInStatement(ast)
             new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
+            v, counter = None, 0
             for stmt in stmts:
-                stmt.accept(self, new_env)
-
+                v = stmt.accept(self, new_env)
+                if counter == 1:
+                    raise UnreachableStatement(stmt)
+                elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK, StaticChecker.RETURN]:
+                    counter += 1
+                    jump_counter += 1
+                    if v == StaticChecker.RETURN:
+                        return_counter += 1
+                elif type(stmt) is If:
+                    if v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
+                        counter += 1
+                        jump_counter += 1
+                        if v == StaticChecker.ALL_RETURN:
+                            return_counter += 1
+            # if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return:
+            #     raise FunctionNotReturn(self.current_fn)
         var_decls, stmts = ast.elseStmt
         new_env = reduce(lambda env, ele: ele.accept(self, env), var_decls, ([], param[0] + param[1]))
+        v, counter = None, 0
         for stmt in stmts:
-            stmt.accept(self, new_env)
+            v = stmt.accept(self, new_env)
+            if counter == 1:
+                raise UnreachableStatement(stmt)
+            elif v in [StaticChecker.CONTINUE, StaticChecker.BREAK, StaticChecker.RETURN]:
+                counter += 1
+                jump_counter += 1
+                if v == StaticChecker.RETURN:
+                    return_counter += 1
+        if len(stmts):
+            if return_counter == len(ast.ifthenStmt) + 1:
+                return StaticChecker.ALL_RETURN
+            elif self.in_loop_counter and jump_counter == len(ast.ifthenStmt) + 1:
+                return StaticChecker.ALL_BRKCNT
+        return
+        # if type(self.fn_returntype) not in [Unknown, VoidType] and not has_return and (len(var_decls) + len(stmts)):
+        #     raise FunctionNotReturn(self.current_fn)
+
 
     def visitFor(self, ast, param):
-        self.infer_type(ast.expr1, IntType(), param)
-        exp1_type = ast.expr1.accept(self, param)
-        check_and_assign(exp1_type, IntType())
-        if get_type(exp1_type) is not IntType:
-            raise TypeMismatchInStatement(ast)
+        self.in_loop_counter += 1
         idx = ast.idx1.accept(self, param)
         if get_type(idx.mtype) is Unknown:
             idx.mtype = IntType()
         elif get_type(idx.mtype) is not IntType:
             raise TypeMismatchInStatement(ast)
-        self.infer_type(ast.expr2, BoolType(), param)
-        self.infer_type(ast.expr3, IntType(), param)
-        exp2_type = ast.expr2.accept(self, param)
-        exp3_type = ast.expr3.accept(self, param)
-        check_and_assign(exp2_type, BoolType())
-        check_and_assign(exp3_type, IntType())
-        if get_type(exp2_type) is not BoolType or get_type(exp3_type) is not IntType:
+
+        try:
+            self.infer_type(ast.expr1, IntType(), param)
+            exp1_type = ast.expr1.accept(self, param)
+            check_and_assign(exp1_type, IntType())
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
+        if get_type(exp1_type) is not IntType:
+            raise TypeMismatchInStatement(ast)
+
+        try:
+            self.infer_type(ast.expr2, BoolType(), param)
+            exp2_type = ast.expr2.accept(self, param)
+            check_and_assign(exp2_type, BoolType())
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
+        if get_type(exp2_type) is not BoolType:
+            raise TypeMismatchInStatement(ast)
+
+        try:
+            self.infer_type(ast.expr3, IntType(), param)
+            exp3_type = ast.expr3.accept(self, param)
+            check_and_assign(exp3_type, IntType())
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
+        if get_type(exp3_type) is not IntType:
             raise TypeMismatchInStatement(ast)
 
         new_env = reduce(lambda env, ele: ele.accept(self, env), ast.loop[0], ([], param[0] + param[1]))
+        v, counter = None, 0
         for stmt in ast.loop[1]:
-            stmt.accept(self, new_env)
+            v = stmt.accept(self, new_env)
+            if counter == 1:
+                raise UnreachableStatement(stmt)
+            elif v in [StaticChecker.BREAK, StaticChecker.CONTINUE, StaticChecker.RETURN]:
+                counter += 1
+            elif type(stmt) is If and v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
+                counter += 1
+        self.in_loop_counter -= 1
 
     def visitContinue(self, ast, param):
-        pass
+        if self.in_loop_counter == 0:
+            raise NotInLoop(ast)
+        return StaticChecker.CONTINUE
 
     def visitBreak(self, ast, param):
-        pass
+        if self.in_loop_counter == 0:
+            raise NotInLoop(ast)
+        return StaticChecker.BREAK
 
     def visitReturn(self, ast, param):
         fn_type = list(filter(lambda x: x.name == self.current_fn and type(x.mtype) is MType, param[0] + param[1]))[0]
         if ast.expr:
-            rettype = ast.expr.accept(self, param)
+            try:
+                rettype = ast.expr.accept(self, param)
+            except TypeCannotBeInferred:
+                raise TypeCannotBeInferred(ast)
             if get_type(rettype) is Unknown:
                 if get_type(fn_type) is Unknown:
                     raise TypeCannotBeInferred(ast)
@@ -461,8 +655,6 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                         else:
                             if type(rettype.mtype.eletype) is Unknown:
                                 if type(fn_type.mtype.restype) is ArrayType:
-                                    if fn_type.mtype.restype.dimen[-1] == -1:
-                                        fn_type.mtype.restype.dimen = rettype.mtype.dimen
                                     if type(fn_type.mtype.restype.eletype) is Unknown:
                                         raise TypeCannotBeInferred(ast)
                                     else:
@@ -495,10 +687,6 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                             if type(rettype.mtype.restype.eletype) is Unknown:
                                 if type(fn_type.mtype.restype.eletype) is Unknown:
                                     raise TypeCannotBeInferred(ast)
-                                elif rettype.mtype.restype.dimen and rettype.mtype.restype.dimen[-1] == -1:
-                                    rettype.mtype.restype.dimen = fn_type.mtype.restype.dimen
-                                elif fn_type.mtype.restype.dimen and fn_type.mtype.restype.dimen[-1] == -1:
-                                    fn_type.mtype.restype.dimen = rettype.mtype.restype.dimen
                                 else:
                                     rettype.mtype.restype.eletype = fn_type.mtype.restype.eletype
                             else:
@@ -506,6 +694,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                                     fn_type.mtype.restype.eletype = rettype.mtype.restype.eletype
                                 elif type(rettype.mtype.restype.eletype) != type(fn_type.mtype.restype.eletype):
                                     raise TypeMismatchInStatement(ast)
+                            if rettype.mtype.restype.dimen != fn_type.mtype.restype.dimen:
+                                raise TypeMismatchInStatement(ast)
                         elif type(rettype.mtype.restype) is not ArrayType and type(fn_type.mtype.restype) is not ArrayType:
                             if type(rettype.mtype.restype) is Unknown and type(fn_type.mtype.restype) is Unknown:
                                 raise TypeCannotBeInferred(ast)
@@ -524,15 +714,13 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                                     raise TypeCannotBeInferred(ast)
                                 else:
                                     rettype.mtype.eletype = fn_type.mtype.restype.eletype
-                                if fn_type.mtype.restype.dimen and fn_type.mtype.restype.dimen[-1] == -1:
-                                    fn_type.mtype.restype.dimen = rettype.mtype.dimen
-                                else:
-                                    rettype.mtype.eletype = fn_type.mtype.restype.eletype
                             else:
                                 if type(fn_type.mtype.restype.eletype) is Unknown:
                                     fn_type.mtype.restype.eletype = rettype.mtype.eletype
                                 elif type(fn_type.mtype.restype.eletype) != type(rettype.mtype.eletype):
                                     raise TypeMismatchInStatement(ast)
+                            if rettype.mtype.dimen != fn_type.mtype.restype.dimen:
+                                raise TypeMismatchInStatement(ast)
                         elif type(fn_type.mtype.restype) is Unknown:
                             if type(rettype.mtype.eletype) is Unknown:
                                 raise TypeCannotBeInferred(ast)
@@ -553,28 +741,55 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
                 check_and_assign(fn_type, VoidType())
             elif get_type(fn_type) is not VoidType:
                 raise TypeMismatchInStatement(ast)
-
+        self.fn_returntype = fn_type.mtype.restype
+        return StaticChecker.RETURN
     def visitDowhile(self, ast, param):
-        self.infer_type(ast.exp, BoolType(), param)
-        exp = ast.exp.accept(self, param)
-        check_and_assign(exp, BoolType())
+        self.in_loop_counter += 1
+        new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))
+        v, counter = None, 0
+        for stmt in ast.sl[1]:
+            v = stmt.accept(self, new_env)
+            if counter == 1:
+                raise UnreachableStatement(stmt)
+            elif v in [StaticChecker.RETURN, StaticChecker.BREAK, StaticChecker.CONTINUE]:
+                counter += 1
+            elif type(stmt) is If and v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
+                counter += 1
+        try:
+            self.infer_type(ast.exp, BoolType(), param)
+            exp = ast.exp.accept(self, param)
+            check_and_assign(exp, BoolType())
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
         if get_type(exp) is not BoolType:
             raise TypeMismatchInStatement(ast)
-        new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))
-        for stmt in ast.sl[1]:
-            stmt.accept(self, new_env)
+        self.in_loop_counter -= 1
 
     def visitWhile(self, ast, param):
-        self.infer_type(ast.exp, BoolType(), param)
-        exp = ast.exp.accept(self, param)
-        check_and_assign(exp, BoolType())
+        self.in_loop_counter += 1
+        try:
+            self.infer_type(ast.exp, BoolType(), param)
+            exp = ast.exp.accept(self, param)
+            check_and_assign(exp, BoolType())
+        except TypeCannotBeInferred:
+            raise TypeCannotBeInferred(ast)
         if get_type(exp) is not BoolType:
             raise TypeMismatchInStatement(ast)
         new_env = reduce(lambda env, ele: ele.accept(self, env), ast.sl[0], ([], param[0] + param[1]))
+        v, counter = None, 0
         for stmt in ast.sl[1]:
-            stmt.accept(self, new_env)
+            v = stmt.accept(self, new_env)
+            if counter == 1:
+                raise UnreachableStatement(stmt)
+            elif v in [StaticChecker.BREAK, StaticChecker.RETURN, StaticChecker.CONTINUE]:
+                counter += 1
+            elif type(stmt) is If and v in [StaticChecker.ALL_RETURN, StaticChecker.ALL_BRKCNT]:
+                counter += 1
+        self.in_loop_counter -= 1
 
     def visitIntLiteral(self, ast, param):
+        if self.has_oor:
+            return ast.value
         return IntType()
 
     def visitFloatLiteral(self, ast, param):
@@ -592,13 +807,13 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
         if len(ele_types) == 0:
             return ArrayType([], Unknown())
         if ele_types[0] is not ArrayType:
-            # if len(set(ele_types)) > 1:
-            #     raise InvalidArrayLiteral(ast)
+            if len(set(ele_types)) > 1:
+                raise InvalidArrayLiteral(ast)
             return ArrayType([len(ast.value)], ele_types[0]())
         else:
             ele_types = [self.arraytype2str(ele) for ele in elements]
-            # if len(set(ele_types)) > 1:
-            #     raise InvalidArrayLiteral(ast)
+            if len(set(ele_types)) > 1:
+                raise InvalidArrayLiteral(ast)
             inner_type = eval(ele_types[0])
             return ArrayType([len(ast.value)] + inner_type.dimen, inner_type.eletype)
     def arraytype2str(self, ele):
@@ -610,6 +825,8 @@ Symbol("printStrLn",MType([StringType()],VoidType()))]
             prime = 'BoolType()'
         elif type(tp) is FloatType:
             prime = 'FloatType()'
+        elif type(tp) is StringType:
+            prime = 'StringType()'
         elif type(tp) is Unknown:
             prime = 'Unknown()'
         else:

@@ -1099,7 +1099,7 @@ class CodeGenVisitor(BaseVisitor):
             for pr, tp in zip(ast.param, func.mtype.intype):
                 idx = frame.getNewIndex()
                 self.emit.printout(self.emit.emitVAR(idx, pr.variable.name, tp, startLabel, endLabel, frame))
-                syms = syms + [Symbol(pr.variable.name, tp, Index(idx))]
+                syms = [Symbol(pr.variable.name, tp, Index(idx))] + syms
         self.emit.printout(self.emit.emitLABEL(startLabel, frame))
         # map(lambda x: self.visit(x, param), ast.body[0] + ast.body[1])
         env = reduce(lambda acc, ele: MethodEnv(frame, [self.visit(ele, acc)] + acc.sym), ast.body[0], MethodEnv(frame, syms))
@@ -1311,7 +1311,7 @@ class CodeGenVisitor(BaseVisitor):
         self.emit.printout(self.emit.emitIFFALSE(break_label, param.frame))
         
         self.visitBlock(ast, param)
-        self.emit.printout(self.emit.GOTO(continue_label, param.frame))
+        self.emit.printout(self.emit.emitGOTO(continue_label, param.frame))
         self.emit.printout(self.emit.emitLABEL(break_label, param.frame))
         param.frame.exitLoop()
     def visitBlock(self, ast, param):
@@ -1341,7 +1341,10 @@ class CodeGenVisitor(BaseVisitor):
         dim1_code, dim1_tp = self.visit(IntLiteral(len(ast.value)), param)
         tp = getTypeOfLiteral(ast.value[0])
         if type(ast.value[0]) is not ArrayLiteral:
-            arr1d_code = self.emit.emitNEWARRAY(tp, param.frame)
+            if type(ast.value[0]) is StringLiteral:
+                arr1d_code = self.emit.emitANEWARRAY(None, StringType(), param.frame)
+            else:
+                arr1d_code = self.emit.emitNEWARRAY(tp, param.frame)
             code = ''
             for i, value in enumerate(ast.value):
                 code += self.emit.emitDUP(param.frame)

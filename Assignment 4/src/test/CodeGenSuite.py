@@ -112,24 +112,197 @@ class CheckCodeGenSuite(unittest.TestCase):
     #     """
     # 	expect = "2222221"
     # 	self.assertTrue(TestCodeGen.test(input,expect,507))
-    def test_case_09(self):
+    # def test_case_09(self):
+    # 	input = """
+    #     Var: x[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    #     Function: main
+    #     Body:
+    #         Var: a[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    #         Var: b = 1, c = 3;
+    #         a[9] = b * c;
+    #         a = foo();
+    #         foo()[b] = int_of_float(0.);
+    #         For (b = 0, b < 10, 1) Do
+    #             print(string_of_int(a[b]));
+    #         EndFor.
+    #     EndBody.
+    #     Function: foo
+    #     Body:
+    #         Return x;
+    #     EndBody.
+    #     """
+    # 	expect = "0023456789"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,508))
+    # def test_case_10(self):
+    # 	input = """
+    #     Var: x[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    #     Function: main
+    #     Body:
+    #         Var: a[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    #         Var: b = 1, c = 3;
+    #         a[9] = b * c;
+    #         Do
+    #             print(string_of_int(a[b]));
+    #             b = b + 1;
+    #         While check(b, 10) EndDo.
+    #         a = foo();
+    #         b = 0 * 8;
+    #         foo()[b] = int_of_float(20.5);
+    #         While b < 10 Do
+    #             print(string_of_int(foo()[b]));
+    #             b = b + 1;
+    #         EndWhile.
+    #     EndBody.
+    #     Function: foo
+    #     Body:
+    #         Return x;
+    #     EndBody.
+    #     Function: check
+    #     Parameter: a, b
+    #     Body:
+    #         Return a < b;
+    #     EndBody.
+    #     """
+    # 	expect = "00000000320123456789"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,509))
+    # def test_case_11(self):
+    # 	input = """
+    #     Var: x[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    #     Function: main
+    #     Body:
+    #         Var: idx = 0;
+    #         foo();
+    #         While idx < 10 Do
+    #             print(string_of_int(x[idx]));
+    #             idx = idx + 1;
+    #         EndWhile.
+    #     EndBody.
+    #     Function: foo
+    #     Body:
+    #         Var: i = 3;
+    #         For (i = 3, cond(i), up()) Do
+    #             x[i] = 22;
+    #         EndFor.
+    #     EndBody.
+    #     Function: cond
+    #     Parameter: x
+    #     Body:
+    #         Var: upper_bound = 6;
+    #         Return x < upper_bound;
+    #     EndBody.
+    #     Function: up
+    #     Body:
+    #         Return 5 \ 2;
+    #     EndBody.
+    #     """
+    # 	expect = "012224226789"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,510))
+    # def test_case_12(self):
+    # 	input = """
+    #     Var: x[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    #     Function: main
+    #     Body:
+    #         Var: idx = 0;
+    #         foo(x);
+    #         While idx < 10 Do
+    #             print(string_of_int(x[idx]));
+    #             idx = idx + 1;
+    #         EndWhile.
+    #     EndBody.
+    #     Function: foo
+    #     Parameter: x[10]
+    #     Body:
+    #         Var: i = 3;
+    #         For (i = 3, cond(i), up()) Do
+    #             x[i] = 77;
+    #         EndFor.
+    #     EndBody.
+    #     Function: cond
+    #     Parameter: x
+    #     Body:
+    #         Var: upper_bound = 6;
+    #         Return x < upper_bound;
+    #     EndBody.
+    #     Function: up
+    #     Body:
+    #         Return 5 \ 2;
+    #     EndBody.
+    #     """
+    # 	expect = "012774776789"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,511))
+    # def test_case_13(self):
+    # 	input = """
+    #     Var: x[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    #     Function: main
+    #     Body:
+    #         swap(x[0], x[1]);
+    #         print(string_of_int(x[0]));
+    #         print(string_of_int(x[1]));
+    #     EndBody.
+    #     Function: swap
+    #     Parameter: x, y
+    #     Body:
+    #         Var: i = 3;
+    #         i = x;
+    #         x = y;
+    #         y = i;
+    #     EndBody.
+        
+    #     """
+    # 	expect = "01"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,512))
+    # def test_case_14(self):
+    # 	input = """
+    #     Var: x[4] = {True, False, False, True};
+    #     Function: main
+    #     Body:
+    #         Var: i = 0;
+    #         If x[0] && x[1] Then
+    #             print("A");
+    #         EndIf.
+    #         Do
+    #             print(string_of_bool(x[i]));
+    #             i = i + 1;
+    #         While i < 4 EndDo.
+    #     EndBody.
+    #     """
+    # 	expect = "truefalsefalsetrue"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,513))
+    # def test_case_15(self):
+    # 	input = """
+    #     Var: x[5] = {0.1, 1.2, 2.4, 3.5, 4.3};
+    #     Function: main
+    #     Body:
+    #         swap(x[0], x[1]);
+    #         print(string_of_float(x[0]));
+    #         print(string_of_float(x[1]));
+    #     EndBody.
+    #     Function: swap
+    #     Parameter: x, y
+    #     Body:
+    #         Var: i = 3.2;
+    #         i = x;
+    #         x = y;
+    #         y = i;
+    #     EndBody.
+    #     """
+    # 	expect = "0.11.2"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,514))
+    def test_case_16(self):
     	input = """
-        Var: x[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        Var: x[5] = {"A", "B", "C", "D", "E"};
         Function: main
         Body:
-            Var: a[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            Var: b = 1, c = 3;
-            a[9] = b * c;
-            a = foo();
-            foo()[b] = int_of_float(0.);
-            For (b = 0, b < 10, 1) Do
-                print(string_of_int(a[b]));
-            EndFor.
+            Var: k = 4;
+            While k >= 0 Do
+                print(x[k]);
+                k = k - foo();
+            EndWhile.
         EndBody.
         Function: foo
         Body:
-            Return x;
+            Return 1;
         EndBody.
         """
-    	expect = "0023456789"
-    	self.assertTrue(TestCodeGen.test(input,expect,507))
+    	expect = "EDCBA"
+    	self.assertTrue(TestCodeGen.test(input,expect,514))

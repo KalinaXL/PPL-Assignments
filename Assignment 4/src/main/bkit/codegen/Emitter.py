@@ -97,6 +97,10 @@ class Emitter():
         frame.pop()
         if type(in_) is cgen.IntType:
             return self.jvm.emitIALOAD()
+        elif type(in_) is cgen.FloatType:
+            return self.jvm.emitFALOAD()
+        elif type(in_) is cgen.BoolType:
+            return self.jvm.emitBALOAD()
         elif type(in_) is cgen.ArrayType or type(in_) is cgen.ClassType or type(in_) is cgen.StringType:
             return self.jvm.emitAALOAD()
         else:
@@ -116,7 +120,7 @@ class Emitter():
             return self.jvm.emitFASTORE()
         elif type(in_) is cgen.BoolType:
             return self.jvm.emitBASTORE()
-        elif type(in_) is cgen.ArrayType or type(in_) is ClassType or type(in_) is cgen.StringType:
+        elif type(in_) is cgen.ArrayType or type(in_) is cgen.ClassType or type(in_) is cgen.StringType:
             return self.jvm.emitAASTORE()
         else:
             raise IllegalOperandException(str(in_))
@@ -180,8 +184,10 @@ class Emitter():
         
         frame.pop()
 
-        if type(inType) is cgen.IntType:
+        if type(inType) in [cgen.IntType, cgen.BoolType]:
             return self.jvm.emitISTORE(index)
+        elif type(inType) is cgen.FloatType:
+            return self.jvm.emitFSTORE(index)
         elif type(inType) is cgen.ArrayType or type(inType) is cgen.ClassType or type(inType) is cgen.StringType:
             return self.jvm.emitASTORE(index)
         else:
@@ -662,15 +668,18 @@ class Emitter():
     def emitANEWARRAY(self, dim, typ, frame):
         result = []
         frame.push()
-        tp = '[' * dim
-        if type(typ) is cgen.IntType:
-            tp += 'I'
-        elif type(typ) is cgen.FloatType:
-            tp += 'F'
-        elif type(typ) is cgen.BoolType:
-            tp += 'Z'
+        if dim is None:
+            tp = "java/lang/String"
         else:
-            tp += 'Ljava/lang/String;'
+            tp = '[' * dim
+            if type(typ) is cgen.IntType:
+                tp += 'I'
+            elif type(typ) is cgen.FloatType:
+                tp += 'F'
+            elif type(typ) is cgen.BoolType:
+                tp += 'Z'
+            else:
+                tp += 'Ljava/lang/String;'
         result.append(self.jvm.emitANEWARRAY(tp))
         return ''.join(result)
     def emitAALOAD(self, frame):

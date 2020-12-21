@@ -1,0 +1,27 @@
+Generated: MCClass.class
+['.source MCClass.java\n.class public MCClass\n.super java.lang.Object\n', '\n.method public static main([Ljava/lang/String;)V\n', '.var 0 is args [Ljava/lang/String; from Label0 to Label1\n', 'Label0:\n', 'Label1:\n', '\treturn\n', '.limit stack 0\n.limit locals 1\n.end method\n', '\n.method public <init>()V\n', '.var 0 is this LMCClass; from Label0 to Label1\n', 'Label0:\n', '\taload_0\n', '\tinvokespecial java/lang/Object/<init>()V\n', 'Label1:\n', '\treturn\n', '.limit stack 1\n.limit locals 1\n.end method\n']
+./test/solutions/502
+RESULT: 
+EXPECT: 123
+Tests run  1
+Errors  []
+[(<CodeGenSuite.CheckCodeGenSuite testMethod=test_case_03>,
+  'Traceback (most recent call last):\n'
+  '  File "test/CodeGenSuite.py", line 31, in test_case_03\n'
+  '    self.assertTrue(TestCodeGen.test(input,expect,502))\n'
+  'AssertionError: False is not true\n')]
+Test output
+ F
+======================================================================
+FAIL: test_case_03 (CodeGenSuite.CheckCodeGenSuite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "test/CodeGenSuite.py", line 31, in test_case_03
+    self.assertTrue(TestCodeGen.test(input,expect,502))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.209s
+
+FAILED (failures=1)
+

@@ -4,3 +4,4 @@
 * Assignment 1 about Lexer and Parser
 * Assignment 2 about building AST
 * Assignment 3 about static checking
+* Assignment 4 about generating Jasmin code for JVM

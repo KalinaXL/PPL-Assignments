@@ -1,56 +1,49 @@
 .source MCClass.java
 .class public MCClass
 .super java.lang.Object
-.field static x [Z
+.field static x [Ljava/lang/String;
 
 .method public static main([Ljava/lang/String;)V
 .var 0 is args [Ljava/lang/String; from Label0 to Label1
 Label0:
-.var 1 is i I from Label0 to Label1
-	iconst_0
+.var 1 is k I from Label0 to Label1
+	iconst_4
 	istore_1
-	getstatic MCClass/x [Z
+Label2:
+	iload_1
 	iconst_0
-	baload
-	getstatic MCClass/x [Z
+	if_icmplt Label4
 	iconst_1
-	baload
-	iand
-	ifle Label3
+	goto Label5
 Label4:
-	ldc "A"
-	invokestatic io/print(Ljava/lang/String;)V
+	iconst_0
 Label5:
+	ifle Label3
+Label6:
+	getstatic MCClass/x [Ljava/lang/String;
+	iload_1
+	aaload
+	invokestatic io/print(Ljava/lang/String;)V
+	iload_1
+	invokestatic MCClass/foo()I
+	isub
+	istore_1
+Label7:
 	goto Label2
 Label3:
-Label2:
-Label8:
-Label9:
-	getstatic MCClass/x [Z
-	iload_1
-	baload
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/print(Ljava/lang/String;)V
-	iload_1
-	iconst_1
-	iadd
-	istore_1
-Label10:
-Label6:
-	iload_1
-	iconst_4
-	if_icmpge Label11
-	iconst_1
-	goto Label12
-Label11:
-	iconst_0
-Label12:
-	ifgt Label8
-Label7:
 Label1:
 	return
-.limit stack 3
+.limit stack 4
 .limit locals 2
+.end method
+
+.method public static foo()I
+Label0:
+	iconst_1
+	ireturn
+Label1:
+.limit stack 1
+.limit locals 0
 .end method
 
 .method public <init>()V
@@ -66,27 +59,31 @@ Label1:
 
 .method public static <clinit>()V
 Label0:
-	iconst_4
-	newarray boolean
+	iconst_5
+	anewarray java/lang/String
 	dup
 	iconst_0
-	iconst_1
-	bastore
+	ldc "A"
+	aastore
 	dup
 	iconst_1
-	iconst_0
-	bastore
+	ldc "B"
+	aastore
 	dup
 	iconst_2
-	iconst_0
-	bastore
+	ldc "C"
+	aastore
 	dup
 	iconst_3
-	iconst_1
-	bastore
-	putstatic MCClass/x [Z
+	ldc "D"
+	aastore
+	dup
+	iconst_4
+	ldc "E"
+	aastore
+	putstatic MCClass/x [Ljava/lang/String;
 Label1:
 	return
-.limit stack 9
+.limit stack 5
 .limit locals 0
 .end method

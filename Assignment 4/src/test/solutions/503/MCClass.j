@@ -5,7 +5,7 @@
 .method public static main([Ljava/lang/String;)V
 .var 0 is args [Ljava/lang/String; from Label0 to Label1
 Label0:
-.var 1 is str [Z from Label0 to Label1
+.var 1 is str [[Z from Label0 to Label1
 	iconst_2
 	anewarray [Z
 	dup
@@ -49,6 +49,7 @@ Label0:
 	iconst_2
 	baload
 	ifle Label3
+Label4:
 	aload_1
 	iconst_0
 	aaload
@@ -56,6 +57,7 @@ Label0:
 	baload
 	invokestatic io/string_of_bool(Z)Ljava/lang/String;
 	invokestatic io/print(Ljava/lang/String;)V
+Label5:
 	goto Label2
 Label3:
 Label2:

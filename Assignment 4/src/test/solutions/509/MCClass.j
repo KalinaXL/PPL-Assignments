@@ -63,6 +63,7 @@ Label0:
 	imul
 	iastore
 Label4:
+Label5:
 	aload_1
 	iload_2
 	iaload
@@ -72,6 +73,7 @@ Label4:
 	iconst_1
 	iadd
 	istore_2
+Label6:
 Label2:
 	iload_2
 	bipush 10
@@ -99,6 +101,7 @@ Label9:
 	iconst_0
 Label10:
 	ifle Label8
+Label11:
 	invokestatic MCClass/foo()[I
 	iload_2
 	iaload
@@ -108,6 +111,7 @@ Label10:
 	iconst_1
 	iadd
 	istore_2
+Label12:
 	goto Label7
 Label8:
 Label1:

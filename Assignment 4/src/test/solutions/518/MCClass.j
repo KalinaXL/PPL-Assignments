@@ -7,45 +7,71 @@
 .var 0 is args [Ljava/lang/String; from Label0 to Label1
 Label0:
 	getstatic MCClass/x [I
-	iconst_0
-	iaload
-	getstatic MCClass/x [I
-	iconst_1
-	iaload
-	invokestatic MCClass/swap(II)V
-	getstatic MCClass/x [I
-	iconst_0
-	iaload
-	invokestatic io/string_of_int(I)Ljava/lang/String;
-	invokestatic io/print(Ljava/lang/String;)V
-	getstatic MCClass/x [I
-	iconst_1
-	iaload
+	bipush 10
+	invokestatic MCClass/foo([II)I
 	invokestatic io/string_of_int(I)Ljava/lang/String;
 	invokestatic io/print(Ljava/lang/String;)V
 Label1:
 	return
-.limit stack 3
+.limit stack 2
 .limit locals 1
 .end method
 
-.method public static swap(II)V
-.var 0 is x I from Label0 to Label1
-.var 1 is y I from Label0 to Label1
+.method public static foo([II)I
+.var 0 is x [I from Label0 to Label1
+.var 1 is length I from Label0 to Label1
 Label0:
-.var 2 is i I from Label0 to Label1
-	iconst_3
-	istore_2
-	iload_0
-	istore_2
 	iload_1
-	istore_0
-	iload_2
-	istore_1
+	iconst_0
+	if_icmpne Label5
+	iconst_1
+	goto Label6
+Label5:
+	iconst_0
+Label6:
+	ifle Label4
+Label7:
+	iconst_0
+	ireturn
+Label8:
+	goto Label2
+Label3:
+	iload_1
+	iconst_1
+	if_icmpne Label9
+	iconst_1
+	goto Label10
+Label9:
+	iconst_0
+Label10:
+	ifle Label3
+Label11:
+	aload_0
+	iconst_0
+	iaload
+	ireturn
+Label12:
+	goto Label2
+Label4:
+Label13:
+	aload_0
+	iload_1
+	iconst_1
+	isub
+	iaload
+	aload_0
+	iload_1
+	iconst_1
+	isub
+	invokestatic MCClass/foo([II)I
+	iadd
+	ireturn
+Label14:
+Label2:
 Label1:
-	return
-.limit stack 1
-.limit locals 3
+	ireturn
+.limit stack 8
+.limit locals 2
 .end method
 
 .method public <init>()V
@@ -65,43 +91,43 @@ Label0:
 	newarray int
 	dup
 	iconst_0
-	iconst_0
-	iastore
-	dup
-	iconst_1
 	iconst_1
 	iastore
 	dup
+	iconst_1
 	iconst_2
+	iastore
+	dup
 	iconst_2
+	iconst_3
 	iastore
 	dup
 	iconst_3
-	iconst_3
-	iastore
-	dup
-	iconst_4
 	iconst_4
 	iastore
 	dup
+	iconst_4
 	iconst_5
+	iastore
+	dup
 	iconst_5
+	bipush 6
 	iastore
 	dup
 	bipush 6
-	bipush 6
-	iastore
-	dup
-	bipush 7
 	bipush 7
 	iastore
 	dup
-	bipush 8
+	bipush 7
 	bipush 8
 	iastore
 	dup
+	bipush 8
 	bipush 9
+	iastore
+	dup
 	bipush 9
+	bipush 10
 	iastore
 	putstatic MCClass/x [I
 Label1:

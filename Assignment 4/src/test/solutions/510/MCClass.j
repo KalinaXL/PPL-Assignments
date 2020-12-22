@@ -20,6 +20,7 @@ Label4:
 	iconst_0
 Label5:
 	ifle Label3
+Label6:
 	getstatic MCClass/x [I
 	iload_1
 	iaload
@@ -29,6 +30,7 @@ Label5:
 	iconst_1
 	iadd
 	istore_1
+Label7:
 	goto Label2
 Label3:
 Label1:
@@ -48,10 +50,12 @@ Label4:
 	iload_0
 	invokestatic MCClass/cond(I)Z
 	ifle Label3
+Label5:
 	getstatic MCClass/x [I
 	iload_0
 	bipush 22
 	iastore
+Label6:
 Label2:
 	iload_0
 	invokestatic MCClass/up()I

@@ -1066,24 +1066,6 @@ class CodeGenVisitor(BaseVisitor):
         self.emit.printout(self.emit.emitENDMETHOD(frame))
         frame.exitScope()
 
-    # The following code is just for initial, students should remove it and write your visitor from here
-    def genMain(self,o):
-        methodname,methodtype = "main",MType([ArrayType([], StringType())],VoidType())
-        frame = Frame(methodname, methodtype.rettype)
-        self.emit.printout(self.emit.emitMETHOD(methodname,methodtype,True,frame))
-        frame.enterScope(True)
-        varname,vartype,varindex = "args",methodtype.intype[0],frame.getNewIndex()
-        startLabel, endLabel = frame.getStartLabel(), frame.getEndLabel()
-        self.emit.printout(self.emit.emitVAR(varindex, varname, vartype, startLabel, endLabel, frame))
-        self.emit.printout(self.emit.emitLABEL(startLabel,frame))
-        self.emit.printout(self.emit.emitPUSHICONST(120, frame))
-        sym = next(filter(lambda x: x.name == "string_of_int",o.sym))
-        self.emit.printout(self.emit.emitINVOKESTATIC(sym.value.value+"/string_of_int",sym.mtype,frame))
-        sym = next(filter(lambda x: x.name == "print",o.sym))
-        self.emit.printout(self.emit.emitINVOKESTATIC(sym.value.value+"/print",sym.mtype,frame))
-        self.emit.printout(self.emit.emitLABEL(endLabel, frame))
-        self.emit.printout(self.emit.emitRETURN(methodtype.rettype, frame))
-        self.emit.printout(self.emit.emitENDMETHOD(frame))
     def genMethod(self, ast, param):
         func = list(filter(lambda x: x.name == ast.name.name, self.env))[0]
         if ast.name.name == 'main':
@@ -1153,7 +1135,7 @@ class CodeGenVisitor(BaseVisitor):
         elif ast.op in ['*', '\\', '*.', '\.']:
             op_code = self.emit.emitMULOP(ast.op[0], left_tp, param.frame)
         elif ast.op == '%':
-            op_code = self.emit.MOD(param.frame)
+            op_code = self.emit.emitMOD(param.frame)
         elif ast.op in ['&&', '||']:
             if ast.op == '&&': op_code = self.emit.emitANDOP(param.frame)
             else: op_code = self.emit.emitOROP(param.frame)
@@ -1194,25 +1176,24 @@ class CodeGenVisitor(BaseVisitor):
     
     def visitArrayCell(self, ast, param):
         arr_code, arr_tp = self.visit(ast.arr, Access(param.frame, param.sym, False))
-        idx_code = reduce(lambda acc, ele: acc + [self.visit(ele, Access(param.frame, param.sym, False))[0]], ast.idx, [])
+        idx_code = reduce(lambda acc, ele: acc + [self.visit(ele, Access(param.frame, param.sym, False))[0]] + [self.emit.emitAALOAD(param.frame)], ast.idx[:-1], [])
+        idx_code += [self.visit(ast.idx[-1], Access(param.frame, param.sym, False))[0]]
         if param.isLeft:
-            return (arr_code + idx_code[0], self.emit.emitASTORE(arr_tp.eletype, param.frame)), arr_tp.eletype
-        if len(ast.idx) > 1:
-            result = ''
-            for i, code in enumerate(idx_code):
-                result += code
-                if i != len(idx_code) - 1:
-                    result += self.emit.emitAALOAD(param.frame)
-                else:
-                    result += self.emit.emitPrimeAALoad(arr_tp.eletype, param.frame)
-            return arr_code + result, arr_tp.eletype
-        return arr_code + idx_code[0] + self.emit.emitALOAD(arr_tp.eletype, param.frame), arr_tp.eletype
+            return (arr_code + ''.join(idx_code), arr_tp.eletype), arr_tp.eletype
+        idx_code += [self.emit.emitALOAD(arr_tp.eletype, param.frame)]
+        return arr_code + ''.join(idx_code), arr_tp.eletype
     
     def visitAssign(self, ast, param):
-        right_code, right_tp = self.visit(ast.rhs, Access(param.frame, param.sym, False))
-        left_code, left_tp = self.visit(ast.lhs, Access(param.frame, param.sym, True))
+        if type(ast.lhs) is ArrayCell:
+            left_code, left_tp = self.visit(ast.lhs, Access(param.frame, param.sym, True))
+            right_code, right_tp = self.visit(ast.rhs, Access(param.frame, param.sym, False))
+        else:
+            right_code, right_tp = self.visit(ast.rhs, Access(param.frame, param.sym, False))
+            left_code, left_tp = self.visit(ast.lhs, Access(param.frame, param.sym, True))
+
         if type(left_code) is tuple:
-            self.emit.printout(left_code[0] + right_code + left_code[1])
+            store_code = self.emit.emitASTORE(left_code[1], param.frame)
+            self.emit.printout(left_code[0] + right_code + store_code)
         else:
             self.emit.printout(right_code + left_code)
     
@@ -1226,24 +1207,31 @@ class CodeGenVisitor(BaseVisitor):
             self.emit.printout(exp_code)
             self.emit.printout(self.emit.emitIFFALSE(labels[i - 1], param.frame))
             param.frame.enterScope(False)
+            start_label, end_label = param.frame.getStartLabel(), param.frame.getEndLabel()
+            self.emit.printout(self.emit.emitLABEL(start_label, param.frame))
             sub_env = reduce(lambda acc, ele: MethodEnv(param.frame, [self.visit(ele, acc)] + acc.sym), var_decls, MethodEnv(param.frame, param.sym))
             for stmt in stmts:
                 self.visit(stmt, sub_env)
+            self.emit.printout(self.emit.emitLABEL(end_label, param.frame))
             param.frame.exitScope()
             self.emit.printout(self.emit.emitGOTO(endLabel, param.frame))
         self.emit.printout(self.emit.emitLABEL(labels[-1], param.frame))
         var_decls, stmts = ast.elseStmt
         if var_decls + stmts:
             param.frame.enterScope(False)
+            start_label, end_label = param.frame.getStartLabel(), param.frame.getEndLabel()
+            self.emit.printout(self.emit.emitLABEL(start_label, param.frame))
             sub_env = reduce(lambda acc, ele: MethodEnv(param.frame, [self.visit(ele, acc)] + acc.sym), var_decls, MethodEnv(param.frame, param.sym))
             for stmt in stmts:
                 self.visit(stmt, sub_env)
+            self.emit.printout(self.emit.emitLABEL(end_label, param.frame))
             param.frame.exitScope()
         self.emit.printout(self.emit.emitLABEL(endLabel, param.frame))
 
     
     def visitFor(self, ast, param):
         param.frame.enterLoop()
+       
         continue_label = param.frame.getContinueLabel()
         break_label = param.frame.getBreakLabel()
         cond_label = param.frame.getNewLabel()
@@ -1255,8 +1243,11 @@ class CodeGenVisitor(BaseVisitor):
         self.emit.printout(self.emit.emitIFFALSE(break_label, param.frame))
         
         param.frame.enterScope(False)
+        start_label, end_label = param.frame.getStartLabel(), param.frame.getEndLabel()
+        self.emit.printout(self.emit.emitLABEL(start_label, param.frame))
         local = reduce(lambda acc, ele: MethodEnv(param.frame, [self.visit(ele, acc)] + acc.sym), ast.loop[0], MethodEnv(param.frame, param.sym))
         list(map(lambda x: self.visit(x, local), ast.loop[1]))
+        self.emit.printout(self.emit.emitLABEL(end_label, param.frame))
         param.frame.exitScope()
 
         self.emit.printout(self.emit.emitLABEL(continue_label, param.frame))
@@ -1316,8 +1307,11 @@ class CodeGenVisitor(BaseVisitor):
         param.frame.exitLoop()
     def visitBlock(self, ast, param):
         param.frame.enterScope(False)
+        start_label, end_label = param.frame.getStartLabel(), param.frame.getEndLabel()
+        self.emit.printout(self.emit.emitLABEL(start_label, param.frame))
         local = reduce(lambda acc, ele: MethodEnv(param.frame, [self.visit(ele, acc)] + acc.sym), ast.sl[0], MethodEnv(param.frame, param.sym))
         list(map(lambda x: self.visit(x, local), ast.sl[1]))
+        self.emit.printout(self.emit.emitLABEL(end_label, param.frame))
         param.frame.exitScope()
 
     def visitCallStmt(self, ast, param):

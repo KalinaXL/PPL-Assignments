@@ -21,7 +21,8 @@ class Emitter():
         elif typeIn is cgen.VoidType:
             return "V"
         elif typeIn is cgen.ArrayType:
-            return "[" + self.getJVMType(inType.eletype)
+            nd = '[' * len(inType.dimen) if inType.dimen else '['
+            return nd + self.getJVMType(inType.eletype)
         elif typeIn is cgen.MType:
             return "(" + "".join(list(map(lambda x: self.getJVMType(x), inType.intype))) + ")" + self.getJVMType(inType.rettype)
         elif typeIn is cgen.ClassType:
@@ -105,12 +106,11 @@ class Emitter():
             return self.jvm.emitAALOAD()
         else:
             raise IllegalOperandException(str(in_))
-
+        
     def emitASTORE(self, in_, frame):
         #in_: Type
         #frame: Frame
         #..., arrayref, index, value -> ...
-        
         frame.pop()
         frame.pop()
         frame.pop()
@@ -148,7 +148,6 @@ class Emitter():
         #index: Int
         #frame: Frame
         #... -> ..., value
-        
         frame.push()
         if type(inType) in [cgen.IntType, cgen.BoolType]:
             return self.jvm.emitILOAD(index)
@@ -181,9 +180,7 @@ class Emitter():
         #index: Int
         #frame: Frame
         #..., value -> ...
-        
         frame.pop()
-
         if type(inType) in [cgen.IntType, cgen.BoolType]:
             return self.jvm.emitISTORE(index)
         elif type(inType) is cgen.FloatType:
@@ -449,9 +446,9 @@ class Emitter():
         #..., value1, value2 -> ..., result
 
         result = list()
+        frame.pop()
+        frame.pop()
 
-        frame.pop()
-        frame.pop()
         if op == ">":
             result.append(self.jvm.emitIFICMPLE(falseLabel))
             result.append(self.emitGOTO(trueLabel))
@@ -685,13 +682,4 @@ class Emitter():
     def emitAALOAD(self, frame):
         frame.pop()
         return self.jvm.emitAALOAD()
-    def emitPrimeAALoad(self, typ, frame):
-        frame.pop()
-        if type(typ) is cgen.IntType:
-            return self.jvm.emitIALOAD()
-        elif type(typ) is cgen.FloatType:
-            return self.jvm.emitFALOAD()
-        elif type(typ) is cgen.BoolType:
-            return self.jvm.emitBALOAD()
-        raise ValueError("the type isn't supported")
-        
+

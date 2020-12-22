@@ -49,8 +49,8 @@ class Frame():
     '''
     def pop(self):
         self.currOpStackSize = self.currOpStackSize - 1
-        # if self.currOpStackSize < 0:
-        #     raise IllegalRuntimeException("Pop empty stack")
+        if self.currOpStackSize < 0:
+            raise IllegalRuntimeException("Pop empty stack")
 
     def getStackSize(self):
         return self.currOpStackSize

@@ -62,54 +62,39 @@ Label0:
 	iload_3
 	imul
 	iastore
+	invokestatic MCClass/foo()[I
+	astore_1
+	invokestatic MCClass/foo()[I
+	iload_2
+	ldc 0.0
+	invokestatic io/int_of_float(F)I
+	iastore
+	iconst_0
+	istore_2
 Label4:
+	iload_2
+	bipush 10
+	if_icmpge Label5
+	iconst_1
+	goto Label6
+Label5:
+	iconst_0
+Label6:
+	ifle Label3
+Label7:
 	aload_1
 	iload_2
 	iaload
 	invokestatic io/string_of_int(I)Ljava/lang/String;
 	invokestatic io/print(Ljava/lang/String;)V
-	iload_2
-	iconst_1
-	iadd
-	istore_2
+Label8:
 Label2:
 	iload_2
-	bipush 10
-	invokestatic MCClass/check(II)Z
-	ifgt Label4
-Label3:
-	invokestatic MCClass/foo()[I
-	astore_1
-	iconst_0
-	bipush 8
-	imul
-	istore_2
-	invokestatic MCClass/foo()[I
-	iload_2
-	ldc 20.5
-	invokestatic io/int_of_float(F)I
-	iastore
-Label7:
-	iload_2
-	bipush 10
-	if_icmpge Label9
-	iconst_1
-	goto Label10
-Label9:
-	iconst_0
-Label10:
-	ifle Label8
-	invokestatic MCClass/foo()[I
-	iload_2
-	iaload
-	invokestatic io/string_of_int(I)Ljava/lang/String;
-	invokestatic io/print(Ljava/lang/String;)V
-	iload_2
 	iconst_1
 	iadd
 	istore_2
-	goto Label7
-Label8:
+	goto Label4
+Label3:
 Label1:
 	return
 .limit stack 5
@@ -123,24 +108,6 @@ Label0:
 Label1:
 .limit stack 1
 .limit locals 0
-.end method
-
-.method public static check(II)Z
-.var 0 is a I from Label0 to Label1
-.var 1 is b I from Label0 to Label1
-Label0:
-	iload_0
-	iload_1
-	if_icmpge Label2
-	iconst_1
-	goto Label3
-Label2:
-	iconst_0
-Label3:
-	ireturn
-Label1:
-.limit stack 3
-.limit locals 2
 .end method
 
 .method public <init>()V

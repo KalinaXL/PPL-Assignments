@@ -1137,19 +1137,24 @@ class CodeGenVisitor(BaseVisitor):
         elif ast.op == '%':
             op_code = self.emit.emitMOD(param.frame)
         elif ast.op in ['&&', '||']:
+            left_tp = BoolType()
             if ast.op == '&&': op_code = self.emit.emitANDOP(param.frame)
             else: op_code = self.emit.emitOROP(param.frame)
         elif ast.op == '=/=':
-            op_code = self.emit.emitREOP('!=', left_tp, param.frame)
+            op_code = self.emit.emitREOP(ast.op, left_tp, param.frame)
+            left_tp = BoolType()
         elif ast.op == '==':
             op_code = self.emit.emitREOP(ast.op, left_tp, param.frame)
+            left_tp = BoolType()
         else:
             op_code = self.emit.emitREOP(ast.op.rstrip('.'), left_tp, param.frame)
+            left_tp = BoolType()
         return left_code + right_code + op_code, left_tp
 
     def visitUnaryOp(self, ast, param):
         exp_code, tp = ast.body.accept(self, param)
         if ast.op == '!':
+            tp = BoolType()
             op_code = self.emit.emitNOT(tp, param.frame)
         else:
             op_code = self.emit.emitNEGOP(tp, param.frame)

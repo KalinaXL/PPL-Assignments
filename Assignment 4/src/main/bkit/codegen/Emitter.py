@@ -80,7 +80,7 @@ class Emitter():
         #typ: Type
         #frame: Frame
         
-        if type(typ) is cgen.IntType:
+        if type(typ) in [cgen.IntType, cgen.BoolType]:
             return self.emitPUSHICONST(in_, frame)
         elif type(typ) is cgen.StringType:
             frame.push()
@@ -319,12 +319,12 @@ class Emitter():
         label1 = frame.getNewLabel()
         label2 = frame.getNewLabel()
         result = list()
-        result.append(emitIFTRUE(label1, frame))
-        result.append(emitPUSHCONST("true", in_, frame))
-        result.append(emitGOTO(label2, frame))
-        result.append(emitLABEL(label1, frame))
-        result.append(emitPUSHCONST("false", in_, frame))
-        result.append(emitLABEL(label2, frame))
+        result.append(self.emitIFTRUE(label1, frame))
+        result.append(self.emitPUSHCONST("true", in_, frame))
+        result.append(self.emitGOTO(label2, frame))
+        result.append(self.emitLABEL(label1, frame))
+        result.append(self.emitPUSHCONST("false", in_, frame))
+        result.append(self.emitLABEL(label2, frame))
         return ''.join(result)
 
     '''
@@ -417,24 +417,47 @@ class Emitter():
 
         frame.pop()
         frame.pop()
-        if op == ">":
-            result.append(self.jvm.emitIFICMPLE(labelF))
-        elif op == ">=":
-            result.append(self.jvm.emitIFICMPLT(labelF))
-        elif op == "<":
-            result.append(self.jvm.emitIFICMPGE(labelF))
-        elif op == "<=":
-            result.append(self.jvm.emitIFICMPGT(labelF))
-        elif op == "!=":
-            result.append(self.jvm.emitIFICMPEQ(labelF))
-        elif op == "==":
-            result.append(self.jvm.emitIFICMPNE(labelF))
-        result.append(self.emitPUSHCONST("1", cgen.IntType(), frame))
-        frame.pop()
-        result.append(self.emitGOTO(labelO, frame))
-        result.append(self.emitLABEL(labelF, frame))
-        result.append(self.emitPUSHCONST("0", cgen.IntType(), frame))
-        result.append(self.emitLABEL(labelO, frame))
+        if type(in_) is cgen.IntType:
+            if op == ">":
+                result.append(self.jvm.emitIFICMPLE(labelF))
+            elif op == ">=":
+                result.append(self.jvm.emitIFICMPLT(labelF))
+            elif op == "<":
+                result.append(self.jvm.emitIFICMPGE(labelF))
+            elif op == "<=":
+                result.append(self.jvm.emitIFICMPGT(labelF))
+            elif op == "!=":
+                result.append(self.jvm.emitIFICMPEQ(labelF))
+            elif op == "==":
+                result.append(self.jvm.emitIFICMPNE(labelF))
+            result.append(self.emitPUSHCONST("1", cgen.IntType(), frame))
+            frame.pop()
+            result.append(self.emitGOTO(labelO, frame))
+            result.append(self.emitLABEL(labelF, frame))
+            result.append(self.emitPUSHCONST("0", cgen.IntType(), frame))
+            result.append(self.emitLABEL(labelO, frame))
+        elif type(in_) is cgen.FloatType:
+            true_label = labelO
+            false_label = labelF
+            frame.push()
+            result.append(self.jvm.emitFCMPL())
+            if op in ['>', '<=']:
+                result.append(self.emitIFTRUE(true_label, frame))
+                v = 0 if op == '>' else 1
+            elif op in ['<', '>=']:
+                # frame.pop()
+                result.append(self.jvm.emitIFGE(true_label))
+                v = 1 if op == '<' else 0
+            elif op == '=/=':
+                # frame.pop()
+                result.append(self.jvm.emitIFNE(true_label))
+                v = 0
+            frame.pop()
+            result.append(self.emitPUSHICONST(v, frame))
+            result.append(self.emitGOTO(false_label, frame))
+            result.append(self.emitLABEL(true_label, frame))
+            result.append(self.emitPUSHICONST(1 - v, frame))
+            result.append(self.emitLABEL(false_label, frame))
         return ''.join(result)
 
     def emitRELOP(self, op, in_, trueLabel, falseLabel, frame):
@@ -448,20 +471,19 @@ class Emitter():
         result = list()
         frame.pop()
         frame.pop()
-
         if op == ">":
             result.append(self.jvm.emitIFICMPLE(falseLabel))
             result.append(self.emitGOTO(trueLabel))
         elif op == ">=":
-            result.append(self.jvm.emitIFICMPLT(falseLabel))
+            result.append(self.emitIFICMPLT(falseLabel))
         elif op == "<":
-            result.append(self.jvm.emitIFICMPGE(falseLabel))
+            result.append(self.emitIFICMPGE(falseLabel))
         elif op == "<=":
-            result.append(self.jvm.emitIFICMPGT(falseLabel))
+            result.append(self.emitIFICMPGT(falseLabel))
         elif op == "!=":
-            result.append(self.jvm.emitIFICMPEQ(falseLabel))
+            result.append(self.emitIFICMPEQ(falseLabel))
         elif op == "==":
-            result.append(self.jvm.emitIFICMPNE(falseLabel))
+            result.append(self.emitIFICMPNE(falseLabel))
         result.append(self.jvm.emitGOTO(trueLabel))
         return ''.join(result)
 

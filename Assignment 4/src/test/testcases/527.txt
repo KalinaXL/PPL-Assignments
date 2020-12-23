@@ -1,0 +1,24 @@
+
+        Var: arr[20] = {1,2,3,4,5,6,7,8,9,10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+        Function: main
+        Body:
+            Var: i = 0;
+            Do
+                If foo(i) Then
+                    printStrLn(string_of_int(i));
+                EndIf.
+            While i < 20 EndDo.
+        EndBody.
+        Function: foo
+        Parameter: number
+        Body:
+            Var: iter = 0;
+            Var: upper = 0, sum = 0e1;
+            upper = 2 * number - 1;
+            For (iter = 1, iter <= int_of_float(float_to_int(upper)), int_of_float(1.24)) Do 
+                sum = sum +. float_to_int(iter);
+                iter = iter + 1;
+            EndFor.
+            Return ! (sum =/= float_to_int(number) *. float_to_int(number));
+        EndBody.
+        

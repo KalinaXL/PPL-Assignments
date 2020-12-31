@@ -1137,9 +1137,19 @@ class CodeGenVisitor(BaseVisitor):
         elif ast.op == '%':
             op_code = self.emit.emitMOD(param.frame)
         elif ast.op in ['&&', '||']:
+            lb = param.frame.getNewLabel()
             left_tp = BoolType()
-            if ast.op == '&&': op_code = self.emit.emitANDOP(param.frame)
-            else: op_code = self.emit.emitOROP(param.frame)
+            code = left_code
+            code += self.emit.emitDUP(param.frame)
+            if ast.op == '&&':
+                code += self.emit.emitIFFALSE(lb, param.frame)
+            else:
+                code += self.emit.emitIFTRUE(lb, param.frame)
+            code += right_code
+            if ast.op == '&&': code += self.emit.emitANDOP(param.frame)
+            else: code += self.emit.emitOROP(param.frame)
+            code += self.emit.emitLABEL(lb, param.frame)
+            return code, BoolType()
         elif ast.op == '=/=':
             op_code = self.emit.emitREOP(ast.op, left_tp, param.frame)
             left_tp = BoolType()

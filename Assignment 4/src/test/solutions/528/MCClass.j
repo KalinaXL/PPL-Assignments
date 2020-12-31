@@ -5,148 +5,159 @@
 .method public static main([Ljava/lang/String;)V
 .var 0 is args [Ljava/lang/String; from Label0 to Label1
 Label0:
-	ldc 1.0
-	fneg
-	ldc 1.0
-	fcmpl
-	ifne Label3
+.var 1 is i I from Label0 to Label1
 	iconst_0
-	goto Label2
-Label3:
-	iconst_1
-Label2:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 1.0
-	fcmpl
-	ifne Label5
-	iconst_0
-	goto Label4
-Label5:
-	iconst_1
+	istore_1
 Label4:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 2.0
-	fneg
-	ldc 2.0
-	fneg
-	fcmpl
-	ifgt Label7
-	iconst_1
-	goto Label6
-Label7:
+Label5:
+.var 2 is flag Z from Label5 to Label6
 	iconst_0
-Label6:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 2.0
-	ldc 1.0
-	fcmpl
-	ifgt Label9
+	istore_2
+.var 3 is j I from Label5 to Label6
+	iconst_0
+	istore_3
+Label7:
+	iload_3
+	iload_1
+	iconst_2
+	idiv
 	iconst_1
-	goto Label8
+	iadd
+	if_icmpge Label9
+	iconst_1
+	goto Label10
 Label9:
 	iconst_0
-Label8:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 1.0
-	fneg
-	fcmpl
-	ifge Label11
-	iconst_0
-	goto Label10
-Label11:
-	iconst_1
 Label10:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 1.0
-	fcmpl
-	ifge Label13
-	iconst_0
-	goto Label12
+	ifle Label8
+Label11:
+	iload_2
+	dup
+	ifgt Label13
+	iload_3
+	iload_1
+	invokestatic MCClass/foo(II)Z
+	ior
 Label13:
-	iconst_1
-Label12:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	fneg
-	ldc 1.0
-	fcmpl
-	ifgt Label15
-	iconst_0
+	istore_2
+	iload_2
+	ifle Label15
+Label16:
+Label17:
 	goto Label14
 Label15:
-	iconst_1
 Label14:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 1.0
-	fcmpl
-	ifgt Label17
-	iconst_0
-	goto Label16
-Label17:
+	iload_3
 	iconst_1
-Label16:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 1.0
-	fcmpl
-	ifge Label19
-	iconst_1
+	iadd
+	istore_3
+Label12:
+	goto Label7
+Label8:
+	iload_2
+	ifle Label19
+Label20:
+	iload_1
+	invokestatic io/string_of_int(I)Ljava/lang/String;
+	invokestatic io/print(Ljava/lang/String;)V
+Label21:
 	goto Label18
 Label19:
-	iconst_0
 Label18:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 1.0
-	fneg
-	fcmpl
-	ifge Label21
+	iload_1
 	iconst_1
-	goto Label20
-Label21:
-	iconst_0
-Label20:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 2.0
-	fcmpl
-	ifge Label23
+	iadd
+	istore_1
+Label6:
+Label2:
+	iload_1
+	bipush 20
+	if_icmpge Label22
 	iconst_1
-	goto Label22
-Label23:
-	iconst_0
+	goto Label23
 Label22:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
-	ldc 1.0
-	ldc 2.0
-	fcmpl
-	ifge Label25
 	iconst_0
-	goto Label24
-Label25:
-	iconst_1
-Label24:
-	invokestatic io/string_of_bool(Z)Ljava/lang/String;
-	invokestatic io/printStrLn(Ljava/lang/String;)V
+Label23:
+	ifgt Label4
+Label3:
 Label1:
 	return
-.limit stack 9
-.limit locals 1
+.limit stack 6
+.limit locals 4
+.end method
+
+.method public static foo(II)Z
+.var 0 is number I from Label0 to Label1
+.var 1 is n I from Label0 to Label1
+Label0:
+.var 2 is iter I from Label0 to Label1
+	iconst_0
+	istore_2
+.var 3 is upper I from Label0 to Label1
+	iconst_0
+	istore_3
+.var 4 is sum F from Label0 to Label1
+	ldc 0.0
+	fstore 4
+	iconst_2
+	iload_0
+	imul
+	iconst_1
+	isub
+	istore_3
+	iconst_1
+	istore_2
+Label4:
+	iload_2
+	iload_3
+	invokestatic io/float_to_int(I)F
+	invokestatic io/int_of_float(F)I
+	if_icmpgt Label5
+	iconst_1
+	goto Label6
+Label5:
+	iconst_0
+Label6:
+	ifle Label3
+Label7:
+	fload 4
+	iload_2
+	invokestatic io/float_to_int(I)F
+	fadd
+	fstore 4
+	iload_2
+	iconst_1
+	iadd
+	istore_2
+Label8:
+Label2:
+	iload_2
+	ldc 1.24
+	invokestatic io/int_of_float(F)I
+	iadd
+	istore_2
+	goto Label4
+Label3:
+	fload 4
+	iload_1
+	invokestatic io/float_to_int(I)F
+	fcmpl
+	ifne Label10
+	iconst_0
+	goto Label9
+Label10:
+	iconst_1
+Label9:
+	ifgt Label11
+	iconst_1
+	goto Label12
+Label11:
+	iconst_0
+Label12:
+	ireturn
+Label1:
+.limit stack 7
+.limit locals 5
 .end method
 
 .method public <init>()V

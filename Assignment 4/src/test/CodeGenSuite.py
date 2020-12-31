@@ -705,23 +705,209 @@ class CheckCodeGenSuite(unittest.TestCase):
     #     """
     # 	expect = "04916"
     # 	self.assertTrue(TestCodeGen.test(input,expect,528))
-    def test_case_30(self):
+    # def test_case_30(self):
+    # 	input = """
+    #     Function: main
+    #     Body:
+    #         printStrLn(string_of_bool(-. 1.0 =/= 1.0));
+    #         printStrLn(string_of_bool(1.0 =/= 1.0));
+    #         printStrLn(string_of_bool(-. 2.0 <=. -. 2.0));
+    #         printStrLn(string_of_bool(2.0 <=. 1.0));
+    #         printStrLn(string_of_bool(1.0 >=. -. 1.0));
+    #         printStrLn(string_of_bool(1.0 >=. 1.0));
+    #         printStrLn(string_of_bool(-. 1.0 >. 1.0));
+    #         printStrLn(string_of_bool(1.0 >. 1.0));
+    #         printStrLn(string_of_bool(1.0 <. 1.0));
+    #         printStrLn(string_of_bool(1.0 <. -. 1.0));
+    #         printStrLn(string_of_bool(1.0 <. 2.0));
+    #         printStrLn(string_of_bool(1.0 >=. 2.0));
+    #     EndBody.
+    #     """
+    # 	expect = "true\nfalse\ntrue\nfalse\ntrue\ntrue\nfalse\nfalse\nfalse\nfalse\ntrue\nfalse\n"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,529))
+    # def test_case_31(self):
+    # 	input = """
+    #     Function: partition
+    #     Parameter: arr[7], low, high
+    #     Body:
+    #         Var: i = 0, pivot = 0;
+    #         Var: j = 0, temp = 0;
+    #         i = low - 1;
+    #         pivot = arr[high];
+    #         For (j = low, j < high, 1) Do
+    #             If arr[j] < pivot Then
+    #                 Var: temp = 0;
+    #                 i = i + 1;
+    #                 temp = arr[i];
+    #                 arr[i] = arr[j];
+    #                 arr[j] = temp;
+    #             EndIf.
+    #         EndFor.
+    #         temp = arr[i + 1];
+    #         arr[i + 1] = pivot;
+    #         arr[high] = temp;
+    #         Return i + 1;
+    #     EndBody.
+    #     Function: quick_sort
+    #     Parameter: x[7], low, high
+    #     Body:
+    #         Var: idx = 0;
+    #         If low >= high Then
+    #             Return;
+    #         EndIf.
+    #         idx = partition(x, low, high);
+    #         print(string_of_int(low));
+    #         print(" ");
+    #         print(string_of_int(high));
+    #         print(" ");
+    #         printStrLn(string_of_int(idx));
+    #         quick_sort(x, low, idx - 1);
+    #         quick_sort(x, idx + 1, high);
+    #     EndBody.
+    #     Function: main
+    #     Body:
+    #       Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+    #       quick_sort(x, 0, 6);
+    #     EndBody.
+    #     """
+    # 	expect = "0 6 4\n0 3 3\n0 2 2\n0 1 1\n5 6 5\n"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,530))
+    # def test_case_32(self):
+    # 	input = """
+    #     Function: partition
+    #     Parameter: arr[7], low, high
+    #     Body:
+    #         Var: i = 0, pivot = 0;
+    #         Var: j = 0, temp = 0;
+    #         i = low;
+    #         pivot = arr[high];
+    #         For (j = low, j < high, 1) Do
+    #             If arr[j] < pivot Then
+    #                If arr[i] != arr[j] Then
+    #                     Var: temp = 0;
+    #                     temp = arr[j];
+    #                     arr[j] = arr[i];
+    #                     arr[i] = temp;
+    #                 EndIf.
+    #                 i = i + 1;
+    #             EndIf.
+    #         EndFor.
+    #         temp = arr[i];
+    #         arr[i] = arr[high];
+    #         arr[high] = temp;
+    #         Return i;
+    #     EndBody.
+    #     Function: quick_sort
+    #     Parameter: x[7], low, high
+    #     Body:
+    #         Var: idx = 0;
+    #         If low >= high Then
+    #             Return;
+    #         EndIf.
+    #         idx = partition(x, low, high);
+    #         quick_sort(x, low, idx - 1);
+    #         quick_sort(x, idx + 1, high);
+
+    #     EndBody.
+    #     Function: main
+    #     Body:
+    #       Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+    #       Var: i = 0;
+    #       quick_sort(x, 0, 6);
+    #       While i < 7 Do
+    #         print(string_of_int(x[i]));
+    #         i = i + 1;
+    #       EndWhile.
+    #     EndBody.
+    #     """
+    # 	expect = "10304050708090"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,531))
+    # def test_case_33(self):
+    # 	input = """
+    #     Function: foo
+    #     Parameter: arr[7], x, y
+    #     Body:
+    #         arr[x] = arr[y] + 1;
+    #         x = y;
+    #     EndBody.
+    #     Function: main
+    #     Body:
+    #       Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+    #       Var: a = 0, b = 4;
+    #       foo(x, a, b);
+    #       print(string_of_int(a));
+    #       print(string_of_int(x[a]));
+    #     EndBody.
+    #     """
+    # 	expect = "041"
+    # 	self.assertTrue(TestCodeGen.test(input,expect,532))
+    # def test_case_34(self):
+    # 	input = """
+    #     Function: main
+    #     Body:
+    #       Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+    #       Var: a = 8, b = 4;
+    #       If (a < 7) && (x[a] == 10) Then
+    #       EndIf.
+    #     EndBody.
+    #     """
+    # 	expect = ""
+    # 	self.assertTrue(TestCodeGen.test(input,expect,533))
+    # def test_case_35(self):
+    # 	input = """
+    #     Function: main
+    #     Body:
+    #       Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+    #       Var: a = 8, b = 4;
+    #       If (a == 8) || (x[a] == 10) Then
+    #       EndIf.
+    #     EndBody.
+    #     """
+    # 	expect = ""
+    # 	self.assertTrue(TestCodeGen.test(input,expect,534))
+    def test_case_36(self):
     	input = """
+        Function: max
+        Parameter: x, y
+        Body:
+            If x < y Then
+                Return y;
+            EndIf.
+            Return x;
+        EndBody.
         Function: main
         Body:
-            printStrLn(string_of_bool(-. 1.0 =/= 1.0));
-            printStrLn(string_of_bool(1.0 =/= 1.0));
-            printStrLn(string_of_bool(-. 2.0 <=. -. 2.0));
-            printStrLn(string_of_bool(2.0 <=. 1.0));
-            printStrLn(string_of_bool(1.0 >=. -. 1.0));
-            printStrLn(string_of_bool(1.0 >=. 1.0));
-            printStrLn(string_of_bool(-. 1.0 >. 1.0));
-            printStrLn(string_of_bool(1.0 >. 1.0));
-            printStrLn(string_of_bool(1.0 <. 1.0));
-            printStrLn(string_of_bool(1.0 <. -. 1.0));
-            printStrLn(string_of_bool(1.0 <. 2.0));
-            printStrLn(string_of_bool(1.0 >=. 2.0));
+            print(string_of_int(max(20, 72)));
         EndBody.
         """
-    	expect = "true\nfalse\ntrue\nfalse\ntrue\ntrue\nfalse\nfalse\nfalse\nfalse\ntrue\nfalse\n"
-    	self.assertTrue(TestCodeGen.test(input,expect,529))
+    	expect = "72"
+    	self.assertTrue(TestCodeGen.test(input,expect,535))
+    def test_case_37(self):
+    	input = """
+        Function: max
+        Parameter: x
+        Body:
+            print(x);
+        EndBody.
+        Function: main
+        Body:
+            max("Hello BKIT");
+        EndBody.
+        """
+    	expect = "Hello BKIT"
+    	self.assertTrue(TestCodeGen.test(input,expect,536))
+    def test_case_38(self):
+    	input = """
+        Var: arr[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+        Function: identity
+        Parameter: x
+        Body:
+            Return x + 1;
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(arr[arr[arr[arr[identity(arr[identity(0)])]]]]));
+        EndBody.
+        """
+    	expect = "7"
+    	self.assertTrue(TestCodeGen.test(input,expect,537))

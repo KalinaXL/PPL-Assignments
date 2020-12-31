@@ -1,0 +1,11 @@
+
+        Function: max
+        Parameter: x
+        Body:
+            print(x);
+        EndBody.
+        Function: main
+        Body:
+            max("Hello BKIT");
+        EndBody.
+        

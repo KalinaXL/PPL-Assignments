@@ -12,20 +12,23 @@ Label0:
 	getstatic MCClass/x [Z
 	iconst_0
 	baload
+	dup
+	ifle Label4
 	getstatic MCClass/x [Z
 	iconst_1
 	baload
 	iand
-	ifle Label3
 Label4:
+	ifle Label3
+Label5:
 	ldc "A"
 	invokestatic io/print(Ljava/lang/String;)V
-Label5:
+Label6:
 	goto Label2
 Label3:
 Label2:
-Label8:
 Label9:
+Label10:
 	getstatic MCClass/x [Z
 	iload_1
 	baload
@@ -35,18 +38,18 @@ Label9:
 	iconst_1
 	iadd
 	istore_1
-Label10:
-Label6:
+Label11:
+Label7:
 	iload_1
 	iconst_4
-	if_icmpge Label11
+	if_icmpge Label12
 	iconst_1
-	goto Label12
-Label11:
-	iconst_0
+	goto Label13
 Label12:
-	ifgt Label8
-Label7:
+	iconst_0
+Label13:
+	ifgt Label9
+Label8:
 Label1:
 	return
 .limit stack 3

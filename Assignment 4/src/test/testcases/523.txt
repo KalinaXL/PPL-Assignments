@@ -1,24 +1,30 @@
 
-        Var: arr[4] = {1, 2, 3, 4}, i = 2;
-        Function: foo
-        Parameter: flag
-        Body:
-            Var: k[4] = {11, 22, 33, 44};
-            i = -2;
-            While flag > 0 Do
-                Return arr;            
-            EndWhile.
-            Return k;
-        EndBody.
         Function: main
         Body:
-            Var: j = 3;
-            foo(0)[foo(1)[1]] = i;
-            printStrLn(string_of_int(i));
-            While j > -1 Do
-                print(string_of_int(arr[j]));
-                print(string_of_int(foo(0)[foo(1)[1]]));
-                j = j - 1;
-            EndWhile.
+            Var: x = 10;
+            Var: u = 1, y = 3, z = 3;
+            test();
+        EndBody.
+        Function: test
+        Body:
+            Var: i = 0;
+            For (i = 0, i < 10, 1) Do
+                Var: s[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+                print(string_of_int(i));
+                print(string_of_int(int_of_float(sum(s))));
+                print(" ");
+                i = i + 2;
+            EndFor.
+        EndBody.
+        Function: sum
+        Parameter: x[9]
+        Body:
+            Var: sum = 0.0;
+            Var: i = 0;
+            Do
+                sum = sum +. float_to_int(x[i]);
+                i = i + 1;
+            While i < 9 EndDo.
+            Return sum;
         EndBody.
         

@@ -1,0 +1,9 @@
+
+        Function: main
+        Body:
+          Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+          Var: a = 8, b = 4;
+          If (a == 8) || (x[a] == 10) Then
+          EndIf.
+        EndBody.
+        

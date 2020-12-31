@@ -1,0 +1,16 @@
+
+        Function: foo
+        Parameter: arr[7], x, y
+        Body:
+            arr[x] = arr[y] + 1;
+            x = y;
+        EndBody.
+        Function: main
+        Body:
+          Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
+          Var: a = 0, b = 4;
+          foo(x, a, b);
+          print(string_of_int(a));
+          print(string_of_int(x[a]));
+        EndBody.
+        

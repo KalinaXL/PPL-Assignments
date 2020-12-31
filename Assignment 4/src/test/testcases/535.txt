@@ -1,0 +1,14 @@
+
+        Function: max
+        Parameter: x, y
+        Body:
+            If x < y Then
+                Return y;
+            EndIf.
+            Return x;
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(max(20, 72)));
+        EndBody.
+        

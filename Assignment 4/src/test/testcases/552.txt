@@ -1,0 +1,14 @@
+
+        Var: x[2] = {1.1, 2.2};
+        Function: foo
+        Body:
+            Return x;
+        EndBody.
+        Function: main
+        Body:
+            foo()[0] = 202.22;
+            print(string_of_float(foo()[0]));
+            print(string_of_float(x[1]));
+            print(string_of_float(x[0]));
+        EndBody.
+        

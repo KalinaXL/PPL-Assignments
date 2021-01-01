@@ -1,0 +1,15 @@
+
+        Function: main
+        Body:
+            Var: i = 0;
+            Var: n = 20;
+            While i < n Do
+                If True Then
+                    i = i + 1;
+                    Continue;
+                EndIf.
+                print("A");
+            EndWhile.
+            print(string_of_int(i));
+        EndBody.
+        

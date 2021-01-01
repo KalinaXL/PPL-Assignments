@@ -1,0 +1,16 @@
+
+        Function: main
+        Body:
+            Var: x = 7;
+            If x < 2 Then
+                print("A");
+            ElseIf x < 4 Then
+                print("B");
+            ElseIf x < 6 Then
+                print("C");
+            ElseIf x < 8 Then
+                print("D");
+            EndIf.
+            print("XL");
+        EndBody.
+        

@@ -704,4 +704,3 @@ class Emitter():
     def emitAALOAD(self, frame):
         frame.pop()
         return self.jvm.emitAALOAD()
-

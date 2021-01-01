@@ -1,0 +1,8 @@
+      
+        Function: main
+        Body:
+            Var: k = 5.0;
+            Var: m = 2.0;
+            print(string_of_int(int_of_float(k \. m)));
+        EndBody.
+        

@@ -43,6 +43,7 @@ Label13:
 	iload_2
 	ifle Label15
 Label16:
+	goto Label8
 Label17:
 	goto Label14
 Label15:

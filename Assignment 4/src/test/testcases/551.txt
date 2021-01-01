@@ -1,0 +1,12 @@
+
+        Var: x[2] = {1.2, 2.0};
+        Function: main
+        Body:
+            print(string_of_float(foo()));
+        EndBody.
+        Function: foo
+        Body:
+            x[0] = -.100.222;
+            Return x[0];
+        EndBody.
+        

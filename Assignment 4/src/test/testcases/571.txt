@@ -1,0 +1,11 @@
+
+        Function: max
+        Parameter: x
+        Body:
+            printStrLn(x);
+        EndBody.
+        Function: main
+        Body:
+            max("Hello 2021");
+        EndBody.
+        

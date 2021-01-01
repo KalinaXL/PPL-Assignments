@@ -1,0 +1,19 @@
+
+        Var: x[5] = {"A", "B", "C", "D", "E"};
+        Function: main
+        Body:
+            Var: k = 4;
+            While k >= 0 Do
+                k = k - foo();
+                If k < 0 Then
+                    print("OutOutOut");
+                    Break;
+                EndIf.
+                print(x[k]);
+            EndWhile.
+        EndBody.
+        Function: foo
+        Body:
+            Return 1;
+        EndBody.
+        

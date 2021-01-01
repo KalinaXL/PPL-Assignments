@@ -1,0 +1,12 @@
+
+        Var: arr[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+        Function: identity
+        Parameter: x
+        Body:
+            Return int_of_float(float_of_string(x));
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(arr[arr[arr[arr[identity("2.424")]]]]));
+        EndBody.
+        

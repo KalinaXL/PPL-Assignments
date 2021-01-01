@@ -1,0 +1,10 @@
+
+        Var: x[4] = {True, True, False, True};
+        Function: main
+        Body:
+            Var: i = 0;
+            If x[0] && x[1] Then
+                print("A");
+            EndIf.
+        EndBody.
+        

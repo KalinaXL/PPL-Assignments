@@ -1278,10 +1278,10 @@ class CodeGenVisitor(BaseVisitor):
         param.frame.exitLoop()
     
     def visitContinue(self, ast, param):
-        self.emit.emitGOTO(param.frame.getContinueLabel(), param.frame)
+        self.emit.printout(self.emit.emitGOTO(param.frame.getContinueLabel(), param.frame))
     
     def visitBreak(self, ast, param):
-        self.emit.emitGOTO(param.frame.getBreakLabel(), param.frame)
+        self.emit.printout(self.emit.emitGOTO(param.frame.getBreakLabel(), param.frame))
     
     def visitReturn(self, ast, param):
         if ast.expr:
@@ -1372,4 +1372,3 @@ class CodeGenVisitor(BaseVisitor):
                 code += c
                 code += self.emit.emitASTORE(ArrayType(None, None), param.frame)
             return dim1_code + arrnd_code + code, ArrayType([len(ast.value)] + inner_type.dimen, tp)
-

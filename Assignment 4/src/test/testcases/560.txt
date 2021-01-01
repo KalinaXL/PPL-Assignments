@@ -1,0 +1,14 @@
+
+        Function: main
+        Body:
+            Var: i = 0;
+            Var: n = 20;
+            While i < n Do
+                While i < 10 Do
+                    print(string_of_int(i));
+                    Break;
+                EndWhile.
+                i = i + 1;
+            EndWhile.
+        EndBody.
+        

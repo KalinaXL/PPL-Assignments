@@ -1,0 +1,18 @@
+
+        Function: main
+        Body:
+            Var: i = 0;
+            Var: n = 20;
+            While i < n Do
+                If i == 5 Then
+                    While True Do
+                        print("a");
+                        Break;
+                    EndWhile.
+                    Break;
+                EndIf.
+                i = i + 1;
+            EndWhile.
+            print(string_of_int(i));
+        EndBody.
+        

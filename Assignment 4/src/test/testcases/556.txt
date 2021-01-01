@@ -1,0 +1,14 @@
+
+        Var: x[10] = {"This", "is", "a", "simple", "testcase", "and", "it", "passes", "doesn\'t", "it?"};
+        Function: main
+        Body:
+            Var: i = 0;
+            Do
+                print(x[i]);
+                If i < 9 Then
+                    print(" ");
+                EndIf.
+                i = i + 1;
+            While i < 10 EndDo.
+        EndBody.
+        

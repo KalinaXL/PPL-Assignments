@@ -1,0 +1,17 @@
+
+        Function: fibonaci
+        Parameter: n
+        Body:
+            Var: x[21] = {0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            Var: i = 2;
+            While i <= n Do
+                x[i] = x[i - 1] + x[i - 2];
+                i = i + 1;
+            EndWhile.
+            print(string_of_int(x[n]));
+        EndBody.
+        Function: main
+        Body:
+            fibonaci(20);
+        EndBody.
+        

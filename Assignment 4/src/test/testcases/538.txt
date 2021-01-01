@@ -1,0 +1,14 @@
+
+        Function: fibonaci
+        Parameter: n
+        Body:
+            If (n == 0) || (n == 1) Then
+                Return n;
+            EndIf.
+            Return fibonaci(n - 1) + fibonaci(n - 2);
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(fibonaci(22)));
+        EndBody.
+        

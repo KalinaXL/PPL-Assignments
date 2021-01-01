@@ -1,0 +1,8 @@
+
+        Function: main
+        Body:
+            Var: str = 210.32e2;
+            str = -.str;
+            print(string_of_float(str));
+        EndBody.
+        

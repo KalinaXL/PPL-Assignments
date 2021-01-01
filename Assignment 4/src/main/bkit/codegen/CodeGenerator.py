@@ -1220,7 +1220,7 @@ class CodeGenVisitor(BaseVisitor):
                 self.emit.printout(self.emit.emitLABEL(labels[i - 1], param.frame))
             exp_code, exp_tp = self.visit(exp, Access(param.frame, param.sym, False))
             self.emit.printout(exp_code)
-            self.emit.printout(self.emit.emitIFFALSE(labels[i - 1], param.frame))
+            self.emit.printout(self.emit.emitIFFALSE(labels[i], param.frame))
             param.frame.enterScope(False)
             start_label, end_label = param.frame.getStartLabel(), param.frame.getEndLabel()
             self.emit.printout(self.emit.emitLABEL(start_label, param.frame))

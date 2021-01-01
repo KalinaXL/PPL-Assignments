@@ -29,7 +29,7 @@ Label0:
 Label5:
 	iconst_0
 Label6:
-	ifle Label4
+	ifle Label3
 Label7:
 	iconst_0
 	ireturn
@@ -44,7 +44,7 @@ Label3:
 Label9:
 	iconst_0
 Label10:
-	ifle Label3
+	ifle Label4
 Label11:
 	aload_0
 	iconst_0

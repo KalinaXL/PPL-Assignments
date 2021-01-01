@@ -1,0 +1,16 @@
+
+        Function: divisors
+        Parameter: n
+        Body:
+            Var: i = 244;
+            For (i = 1, i < n + 1, 1) Do
+                If n % i == 0 Then
+                    print(string_of_float(float_to_int(i)));
+                EndIf.
+            EndFor.
+        EndBody.
+        Function: main
+        Body:
+            divisors(30);
+        EndBody.
+        

@@ -1,0 +1,7 @@
+Function: main
+                   Body: 
+                        print(string_of_int(120));
+                        print(string_of_float(-.12.527e-2));
+                        print(string_of_bool(True));
+                        print(string_of_bool(False));
+                   EndBody.

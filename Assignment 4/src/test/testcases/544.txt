@@ -1,0 +1,20 @@
+
+        Function: main
+        Body:
+            Var: str[2][3] = {{True, False, True}, {False, True, False}};
+            Var: flag = True;
+            Var: i = 0, j = 0;
+            For(i = 0, i < 2, 1) Do
+                For (j = 0, j < 3, 1) Do
+                    flag = flag && str[i][j];
+                EndFor.
+            EndFor.
+            If flag Then
+                print(string_of_int(i));
+                print(string_of_int(j));
+            Else
+                print(string_of_int(j));
+                print(string_of_int(i));
+            EndIf.
+        EndBody.
+        

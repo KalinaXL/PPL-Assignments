@@ -6,7 +6,7 @@
 .var 0 is args [Ljava/lang/String; from Label0 to Label1
 Label0:
 .var 1 is x I from Label0 to Label1
-	iconst_2
+	iconst_4
 	istore_1
 	iload_1
 	iconst_3

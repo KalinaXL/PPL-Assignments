@@ -1,0 +1,14 @@
+
+        Function: main
+        Body:
+            Var: x = 2;
+            Var: y = 0.0;
+            y = -.2.0 *. float_to_int(x) +. foo(float_to_int(3));
+            print(string_of_float(y));
+        EndBody.
+        Function: foo
+        Parameter: x
+        Body:
+            Return x;
+        EndBody.
+        

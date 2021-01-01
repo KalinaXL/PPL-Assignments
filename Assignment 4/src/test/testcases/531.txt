@@ -1,9 +1,47 @@
 
+        Function: partition
+        Parameter: arr[7], low, high
+        Body:
+            Var: i = 0, pivot = 0;
+            Var: j = 0, temp = 0;
+            i = low;
+            pivot = arr[high];
+            For (j = low, j < high, 1) Do
+                If arr[j] < pivot Then
+                   If arr[i] != arr[j] Then
+                        Var: temp = 0;
+                        temp = arr[j];
+                        arr[j] = arr[i];
+                        arr[i] = temp;
+                    EndIf.
+                    i = i + 1;
+                EndIf.
+            EndFor.
+            temp = arr[i];
+            arr[i] = arr[high];
+            arr[high] = temp;
+            Return i;
+        EndBody.
+        Function: quick_sort
+        Parameter: x[7], low, high
+        Body:
+            Var: idx = 0;
+            If low >= high Then
+                Return;
+            EndIf.
+            idx = partition(x, low, high);
+            quick_sort(x, low, idx - 1);
+            quick_sort(x, idx + 1, high);
+
+        EndBody.
         Function: main
         Body:
           Var: x[7] = {10, 80, 30, 90, 40, 50, 70};
-          Var: a = 7, b = 4;
-          If (a < 7) && (x[a] == 10) Then
-          EndIf.
+          Var: i = 0;
+          quick_sort(x, 0, 6);
+          While i < 7 Do
+            print(string_of_int(x[i]));
+            i = i + 1;
+          EndWhile.
         EndBody.
         

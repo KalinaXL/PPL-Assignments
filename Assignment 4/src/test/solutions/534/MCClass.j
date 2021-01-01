@@ -44,15 +44,15 @@ Label0:
 	iconst_4
 	istore_3
 	iload_2
-	bipush 7
-	if_icmpge Label4
+	bipush 8
+	if_icmpne Label4
 	iconst_1
 	goto Label5
 Label4:
 	iconst_0
 Label5:
 	dup
-	ifle Label8
+	ifgt Label8
 	aload_1
 	iload_2
 	iaload
@@ -63,7 +63,7 @@ Label5:
 Label6:
 	iconst_0
 Label7:
-	iand
+	ior
 Label8:
 	ifle Label3
 Label9:

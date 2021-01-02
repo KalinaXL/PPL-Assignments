@@ -1,0 +1,17 @@
+
+        Var: a = 0.e2, b = False, arr[2][2] = {{"Subject", "Mandatory"}, {"PPL", "Harmonic mean"}};
+        Function: f
+        Body:
+            Return arr;
+        EndBody.
+        Function: main
+        Parameter: x, y
+        Body:
+            f()[1][0] = "a * 2";
+            arr[0][1] = "PPL!!! hard!!!";
+            print(arr[0][0]);
+            print(arr[0][1]);
+            print(arr[1][0]);
+            print(arr[1][1]);
+        EndBody.
+        

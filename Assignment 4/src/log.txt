@@ -1,27 +1,32 @@
-Generated: MCClass.class
-['.source MCClass.java\n.class public MCClass\n.super java.lang.Object\n', '\n.method public static main([Ljava/lang/String;)V\n', '.var 0 is args [Ljava/lang/String; from Label0 to Label1\n', 'Label0:\n', 'Label1:\n', '\treturn\n', '.limit stack 0\n.limit locals 1\n.end method\n', '\n.method public <init>()V\n', '.var 0 is this LMCClass; from Label0 to Label1\n', 'Label0:\n', '\taload_0\n', '\tinvokespecial java/lang/Object/<init>()V\n', 'Label1:\n', '\treturn\n', '.limit stack 1\n.limit locals 1\n.end method\n']
-./test/solutions/502
-RESULT: 
-EXPECT: 123
 Tests run  1
-Errors  []
-[(<CodeGenSuite.CheckCodeGenSuite testMethod=test_case_03>,
-  'Traceback (most recent call last):\n'
-  '  File "test/CodeGenSuite.py", line 31, in test_case_03\n'
-  '    self.assertTrue(TestCodeGen.test(input,expect,502))\n'
-  'AssertionError: False is not true\n')]
+Errors  [(<CodeGenSuite.CheckCodeGenSuite testMethod=test_case_99>, 'Traceback (most recent call last):\n  File "test/CodeGenSuite.py", line 2161, in test_case_99\n    self.assertTrue(TestCodeGen.test(input, expect, 598))\n  File "test/TestUtils.py", line 163, in test\n    codeGen.gen(asttree, path)\n  File "./main/bkit/codegen/CodeGenerator.py", line 987, in gen\n    gc = CodeGenVisitor(ast, gl, dir_)\n  File "./main/bkit/codegen/CodeGenerator.py", line 1004, in __init__\n    self.symbols_table = list(filter(lambda x: type(x.mtype) is MType and x.name not in builtin_fns, self.static_check.check()[0]))\n  File "./main/bkit/codegen/CodeGenerator.py", line 217, in check\n    return self.visit(self.ast,self.global_envi)\n  File "./main/bkit/utils/Visitor.py", line 7, in visit\n    return ast.accept(self,param)\n  File "./main/bkit/utils/AST.py", line 55, in accept\n    return v.visitProgram(self, param)\n  File "./main/bkit/codegen/CodeGenerator.py", line 239, in visitProgram\n    raise UnreachableFunction(fn_name)\nCodeGenerator.UnreachableFunction: str(UnreachableFunction(\'goo\'))\n')]
+[]
 Test output
- F
+ E
 ======================================================================
-FAIL: test_case_03 (CodeGenSuite.CheckCodeGenSuite)
+ERROR: test_case_99 (CodeGenSuite.CheckCodeGenSuite)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "test/CodeGenSuite.py", line 31, in test_case_03
-    self.assertTrue(TestCodeGen.test(input,expect,502))
-AssertionError: False is not true
+  File "test/CodeGenSuite.py", line 2161, in test_case_99
+    self.assertTrue(TestCodeGen.test(input, expect, 598))
+  File "test/TestUtils.py", line 163, in test
+    codeGen.gen(asttree, path)
+  File "./main/bkit/codegen/CodeGenerator.py", line 987, in gen
+    gc = CodeGenVisitor(ast, gl, dir_)
+  File "./main/bkit/codegen/CodeGenerator.py", line 1004, in __init__
+    self.symbols_table = list(filter(lambda x: type(x.mtype) is MType and x.name not in builtin_fns, self.static_check.check()[0]))
+  File "./main/bkit/codegen/CodeGenerator.py", line 217, in check
+    return self.visit(self.ast,self.global_envi)
+  File "./main/bkit/utils/Visitor.py", line 7, in visit
+    return ast.accept(self,param)
+  File "./main/bkit/utils/AST.py", line 55, in accept
+    return v.visitProgram(self, param)
+  File "./main/bkit/codegen/CodeGenerator.py", line 239, in visitProgram
+    raise UnreachableFunction(fn_name)
+CodeGenerator.UnreachableFunction: str(UnreachableFunction('goo'))
 
 ----------------------------------------------------------------------
-Ran 1 test in 0.209s
+Ran 1 test in 0.062s
 
-FAILED (failures=1)
+FAILED (errors=1)
 

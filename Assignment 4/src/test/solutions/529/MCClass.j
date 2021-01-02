@@ -145,7 +145,7 @@ Label24:
 	invokestatic io/printStrLn(Ljava/lang/String;)V
 Label1:
 	return
-.limit stack 9
+.limit stack 13
 .limit locals 1
 .end method
 

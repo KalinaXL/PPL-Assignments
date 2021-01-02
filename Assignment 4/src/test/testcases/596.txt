@@ -1,0 +1,15 @@
+
+        Function: cout
+        Parameter: arr[5]
+        Body:
+            Var: i = 0;
+            Do
+                print(arr[i]);
+                i = i + 1;
+            While i < 5 EndDo.
+        EndBody.
+        Function: main
+        Body:
+            cout({"AE", "YU", "QW", "OI", "PT"});
+        EndBody.
+        

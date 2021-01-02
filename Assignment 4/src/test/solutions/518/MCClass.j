@@ -1,29 +1,20 @@
 .source MCClass.java
 .class public MCClass
 .super java.lang.Object
-.field static x [I
+.field static x [[[F
 
 .method public static main([Ljava/lang/String;)V
 .var 0 is args [Ljava/lang/String; from Label0 to Label1
 Label0:
-	getstatic MCClass/x [I
-	bipush 10
-	invokestatic MCClass/foo([II)I
-	invokestatic io/string_of_int(I)Ljava/lang/String;
-	invokestatic io/print(Ljava/lang/String;)V
-Label1:
-	return
-.limit stack 2
-.limit locals 1
-.end method
-
-.method public static foo([II)I
-.var 0 is x [I from Label0 to Label1
-.var 1 is length I from Label0 to Label1
-Label0:
-	iload_1
+.var 1 is i I from Label0 to Label1
 	iconst_0
-	if_icmpne Label5
+	istore_1
+	iconst_0
+	istore_1
+Label4:
+	iload_1
+	iconst_2
+	if_icmpge Label5
 	iconst_1
 	goto Label6
 Label5:
@@ -31,47 +22,80 @@ Label5:
 Label6:
 	ifle Label3
 Label7:
+.var 2 is k I from Label7 to Label8
 	iconst_0
-	ireturn
-Label8:
-	goto Label2
-Label3:
-	iload_1
-	iconst_1
-	if_icmpne Label9
-	iconst_1
-	goto Label10
+	istore_2
 Label9:
-	iconst_0
-Label10:
-	ifle Label4
+	iload_2
+	iconst_1
+	if_icmpge Label11
+	iconst_1
+	goto Label12
 Label11:
-	aload_0
 	iconst_0
-	iaload
-	ireturn
 Label12:
-	goto Label2
-Label4:
+	ifle Label10
 Label13:
-	aload_0
+.var 3 is h I from Label13 to Label14
+	iconst_0
+	istore_3
+Label17:
+Label18:
+	getstatic MCClass/x [[[F
 	iload_1
+	aaload
+	invokestatic MCClass/foo()I
 	iconst_1
 	isub
-	iaload
-	aload_0
-	iload_1
+	aaload
+	iload_3
+	faload
+	invokestatic io/string_of_float(F)Ljava/lang/String;
+	invokestatic io/print(Ljava/lang/String;)V
+	iload_3
 	iconst_1
-	isub
-	invokestatic MCClass/foo([II)I
 	iadd
-	ireturn
+	istore_3
+Label19:
+Label15:
+	iload_3
+	iconst_2
+	if_icmpge Label20
+	iconst_1
+	goto Label21
+Label20:
+	iconst_0
+Label21:
+	ifgt Label17
+Label16:
+	iload_2
+	iconst_1
+	iadd
+	istore_2
 Label14:
+	goto Label9
+Label10:
+Label8:
 Label2:
+	iload_1
+	invokestatic MCClass/foo()I
+	iadd
+	istore_1
+	goto Label4
+Label3:
 Label1:
-	ireturn
+	return
 .limit stack 8
-.limit locals 2
+.limit locals 4
+.end method
+
+.method public static foo()I
+Label0:
+	iconst_1
+	ireturn
+Label1:
+.limit stack 1
+.limit locals 0
 .end method
 
 .method public <init>()V
@@ -87,51 +111,47 @@ Label1:
 
 .method public static <clinit>()V
 Label0:
-	bipush 10
-	newarray int
+	iconst_2
+	anewarray [[F
 	dup
 	iconst_0
 	iconst_1
-	iastore
+	anewarray [F
+	dup
+	iconst_0
+	iconst_2
+	newarray float
+	dup
+	iconst_0
+	ldc 2.2
+	fastore
 	dup
 	iconst_1
+	ldc 4.3
+	fastore
+	aastore
+	aastore
+	dup
+	iconst_1
+	iconst_1
+	anewarray [F
+	dup
+	iconst_0
 	iconst_2
-	iastore
+	newarray float
 	dup
-	iconst_2
-	iconst_3
-	iastore
+	iconst_0
+	ldc 1.2
+	fastore
 	dup
-	iconst_3
-	iconst_4
-	iastore
-	dup
-	iconst_4
-	iconst_5
-	iastore
-	dup
-	iconst_5
-	bipush 6
-	iastore
-	dup
-	bipush 6
-	bipush 7
-	iastore
-	dup
-	bipush 7
-	bipush 8
-	iastore
-	dup
-	bipush 8
-	bipush 9
-	iastore
-	dup
-	bipush 9
-	bipush 10
-	iastore
-	putstatic MCClass/x [I
+	iconst_1
+	ldc 3.4
+	fastore
+	aastore
+	aastore
+	putstatic MCClass/x [[[F
 Label1:
 	return
-.limit stack 5
+.limit stack 15
 .limit locals 0
 .end method

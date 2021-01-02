@@ -1,0 +1,16 @@
+
+        Var: i = 10;
+        Var: f = 22.22;
+        Var: y = True, z = False;
+        Function: main
+        Body:
+            print(string_of_int(---------------i));
+            print(string_of_int(--------------i));
+            print(string_of_float(-.-.-.-.-.-.-.f));
+            print(string_of_float(-.-.-.-.-.-.-.-.f));
+            print(string_of_bool(!!!!!y));
+            print(string_of_bool(!!!!!!y));
+            print(string_of_bool(!!!!!!z));
+            print(string_of_bool(!!!!!!!z));
+        EndBody.
+        

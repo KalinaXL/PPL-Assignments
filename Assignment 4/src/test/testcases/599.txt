@@ -1,0 +1,21 @@
+
+        Var: x = 1, a[3] = {10, 100, 100}, b[5] = {4, 6, 9, 8, 10};
+        Function: main
+        Parameter: x
+        Body:
+            a[0] = test() * b[2];
+            For (x = 0, x < 3, 1) Do
+                print(string_of_int(a[x]));
+            EndFor.
+        EndBody.
+        Function: f
+        Parameter: z, t
+        Body:
+            a[1] = 750;
+            Return a;
+        EndBody.
+        Function: test
+        Body:
+            Return f(2, 5)[x];
+        EndBody.
+        

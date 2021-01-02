@@ -1,0 +1,21 @@
+
+        Function: count_len
+        Parameter: arr[20]
+        Body:
+            Var: count = 0;
+            While arr[count] != 0 Do
+                count = count + 1;
+            EndWhile.
+            Return count;
+        EndBody.
+        Function: main
+        Body:
+            Var: arr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            Var: i = 15;
+            Do
+                arr[i] = i + 1;
+                i = i - 1;
+            While i > -1 EndDo.
+            print(string_of_int(count_len(arr)));
+        EndBody.
+        

@@ -1,0 +1,15 @@
+
+        Var: arr[4] = {1111, 2222, 3333, 4444};
+        Var: i = 7777;
+        Function: f
+        Body:
+            print(string_of_int(i));
+            i = 5555;
+            Return i;
+        EndBody.
+        Function: main
+        Body:
+            i = f();
+            print(string_of_int(i));
+        EndBody.
+        

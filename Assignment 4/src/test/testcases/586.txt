@@ -1,0 +1,31 @@
+
+        Function: mul_mat
+        Parameter: x[2][4], y[4][3], result[2][3]
+        Body:
+            Var: i = 0, j = 0;
+            For (i = 0, i < 2, 1) Do
+                For (j = 0, j < 3, 1) Do
+                    Var: sum = 0;
+                    Var: k = 0;
+                    Do
+                        sum = sum + x[i][k] * y[k][j];
+                        k = k + 1;
+                    While k < 4 EndDo.
+                    result[i][j] = sum;
+                EndFor.
+            EndFor.
+        EndBody.
+        Function: main
+        Body:
+            Var: x[2][4] = {{2, 3, 5, 1}, {6, 2, 5, 2}};
+            Var: y[4][3] = {{623, 123, 312}, {132, 423, 123}, {243, 314, 643}, {363, 798, 432}};
+            Var: result[2][3] = {{0, 0, 0}, {0, 0, 0}};
+            Var: i = 0, j = 0;
+            mul_mat(x, y, result);
+            For (i = 0, i < 2, 1) Do
+                For(j = 0, j < 3, 1) Do
+                    print(string_of_int(result[i][j]));
+                EndFor.
+            EndFor.
+        EndBody.
+        

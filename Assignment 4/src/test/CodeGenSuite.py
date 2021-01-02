@@ -389,27 +389,6 @@ class CheckCodeGenSuite(unittest.TestCase):
         """
     	expect = "2.24.31.23.4"
     	self.assertTrue(TestCodeGen.test(input,expect,518))
-    def test_case_19(self):
-    	input = """
-        Var: x[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        Function: main
-        Body:
-            print(string_of_int(foo(x, 10)));
-        EndBody.
-        Function: foo
-        Parameter: x[10], length
-        Body:
-            If length == 0 Then
-                Return 0;
-            ElseIf length == 1 Then
-                Return x[0];
-            Else
-                Return x[length - 1] + foo(x, length -  1);
-            EndIf.
-        EndBody.
-        """
-    	expect = "55"
-    	self.assertTrue(TestCodeGen.test(input,expect,518))
     def test_case_20(self):
     	input = """
         Var: x[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -1593,60 +1572,648 @@ class CheckCodeGenSuite(unittest.TestCase):
         """
     	expect = "6"
     	self.assertTrue(TestCodeGen.test(input,expect,572))
-    # def test_case_39(self):
-    # 	input = """
-    #     Function: fibonaci
-    #     Parameter: n
-    #     Body:
-    #         If (n == 0) || (n == 1) Then
-    #             Return n;
-    #         EndIf.
-    #         Return fibonaci(n - 1) + fibonaci(n - 2);
-    #     EndBody.
-    #     Function: main
-    #     Body:
-    #         print(string_of_int(fibonaci(22)));
-    #     EndBody.
-    #     """
-    # 	expect = "17711"
-    # 	self.assertTrue(TestCodeGen.test(input,expect,538))
-    # def test_case_40(self):
-    #     input = """
-    #     Function: fibonaci
-    #     Parameter: n
-    #     Body:
-    #         Var: x[21] = {0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    #         Var: i = 2;
-    #         While i <= n Do
-    #             x[i] = x[i - 1] + x[i - 2];
-    #             i = i + 1;
-    #         EndWhile.
-    #         print(string_of_int(x[n]));
-    #     EndBody.
-    #     Function: main
-    #     Body:
-    #         fibonaci(20);
-    #     EndBody.
-    #     """
-    #     expect = "6765"
-    #     self.assertTrue(TestCodeGen.test(input,expect,539))
-    # def test_case_41(self):
-    # 	input = """
-    #     Function: fibonaci
-    #     Parameter: n
-    #     Body:
-    #         Var: i = 2;
-    #         Var: f = 0, g = 1;
-    #         For (i = 2, i < n + 1, 1) Do
-    #             g = f + g;
-    #             f = g - f;
-    #         EndFor.
-    #         print(string_of_int(g));
-    #     EndBody.
-    #     Function: main
-    #     Body:
-    #         fibonaci(30);
-    #     EndBody.
-    #     """
-    # 	expect = "832040"
-    # 	self.assertTrue(TestCodeGen.test(input,expect,540))
+    def test_case_74(self):
+    	input = """
+        Function: fibonaci
+        Parameter: n
+        Body:
+            While n > 0 Do
+                Return n;
+            EndWhile.
+            Return 1;
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(fibonaci(22)));
+        EndBody.
+        """
+    	expect = "22"
+    	self.assertTrue(TestCodeGen.test(input,expect,573))
+    def test_case_75(self):
+    	input = """
+        Var: x[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        Function: main
+        Body:
+            print(string_of_int(foo(x, 10)));
+        EndBody.
+        Function: foo
+        Parameter: x[10], length
+        Body:
+            If length == 0 Then
+                Return 0;
+            ElseIf length == 1 Then
+                Return x[0];
+            Else
+                Return x[length - 1] + foo(x, length -  1);
+            EndIf.
+        EndBody.
+        """
+    	expect = "55"
+    	self.assertTrue(TestCodeGen.test(input,expect,574))
+    def test_case_76(self):
+    	input = """
+        Function: count_len
+        Parameter: arr[20]
+        Body:
+            Var: count = 0;
+            While arr[count] != 0 Do
+                count = count + 1;
+            EndWhile.
+            Return count;
+        EndBody.
+        Function: main
+        Body:
+            Var: arr[20] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+            Var: i = 15;
+            Do
+                arr[i] = i + 1;
+                i = i - 1;
+            While i > -1 EndDo.
+            print(string_of_int(count_len(arr)));
+        EndBody.
+        """
+    	expect = "16"
+    	self.assertTrue(TestCodeGen.test(input,expect,575))
+    def test_case_77(self):
+        input = """
+            Var: x = 1;
+            Function: main
+            Parameter: args
+            Body:
+                Var: x = 3;
+                x = 2 + x;
+                x = foo(2);
+                x = foo(3) + 1;
+                print(string_of_int(x));
+                Return;
+            EndBody.
+            
+            Function: foo
+            Parameter: x
+            Body: 
+                x = x + 1;
+                Return 5;
+            EndBody.
+        """
+        expect = '6'
+        self.assertTrue(TestCodeGen.test(input, expect, 576))
+    def test_case_78(self):
+        input = """
+        Var: arr[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, i = 0;
+        Function: foo
+        Body:
+            Return arr;
+        EndBody.
+        Function: main
+        Body:
+            foo()[7] = foo()[9];
+            print(string_of_int(foo()[7]));
+            print(string_of_int(foo()[9]));
+        EndBody.
+        """
+        expect = '99'
+        self.assertTrue(TestCodeGen.test(input, expect, 577))
+    def test_case_79(self):
+        input = """
+        Var: x = 0.0;
+        Var: a[4] = {False, True, False, True}, b[5] = {"A1", "B2", "C3", "D4", "E5"};
+        Function: main
+        Parameter: x
+        Body:
+            Do
+                printStrLn(b[int_of_float(x)]);
+                x = x +. 1.;
+                If x >. 2.001 Then
+                    Break;
+                EndIf.
+            While f(a[1]) || f(a[2]) EndDo.
+        EndBody.
+        Function: f
+        Parameter: k
+        Body:
+            b[1] = "dasd";
+            Return True;
+        EndBody.
+        """
+        expect = 'A1\ndasd\nC3\n'
+        self.assertTrue(TestCodeGen.test(input, expect, 578))
+    def test_case_80(self):
+        input = """
+        Var: x = 0.052;
+        Var: a[4] = {False, True, False, True}, b[5] = {"A1", "B2", "C3", "D4", "E5"};
+        Function: main
+        Parameter: x
+        Body:
+            Do
+                printStrLn(b[int_of_float(x)]);
+                x = x +. 1.;
+                If x <. 2.001 Then
+                    Continue;
+                EndIf.
+                Break;
+            While f(a[1]) || f(a[2]) EndDo.
+        EndBody.
+        Function: f
+        Parameter: k
+        Body:
+            b[1] = "dasd";
+            Return True;
+        EndBody.
+        """
+        expect = 'A1\ndasd\n'
+        self.assertTrue(TestCodeGen.test(input, expect, 579))
+    def test_case_81(self):
+        input = """
+        Var: x = 0.052;
+        Var: a[4] = {False, True, False, True}, b[5] = {"A1", "B2", "C3", "D4", "E5"};
+        Function: main
+        Parameter: x
+        Body:
+            Do
+                printStrLn(b[int_of_float(x)]);
+                x = x +. 1.;
+                If x =/= 4.052 Then
+                    Continue;
+                EndIf.
+                Break;
+            While f(a[1]) || f(a[2]) EndDo.
+        EndBody.
+        Function: f
+        Parameter: k
+        Body:
+            b[1] = "dasd";
+            Return True;
+        EndBody.
+        """
+        expect = 'A1\ndasd\nC3\nD4\n'
+        self.assertTrue(TestCodeGen.test(input, expect, 580))
+    def test_case_82(self):
+        input = """
+        Var: x = 0.052;
+        Var: a[4] = {False, True, False, True}, b[5] = {"A1", "B2", "C3", "D4", "E5"};
+        Function: main
+        Parameter: x
+        Body:
+            Do
+                printStrLn(b[int_of_float(x)]);
+                x = x +. 1.;
+                If x <=. 4.052 Then
+                    Continue;
+                EndIf.
+                Break;
+            While f(a[1]) || f(a[2]) EndDo.
+        EndBody.
+        Function: f
+        Parameter: k
+        Body:
+            b[1] = "dasd";
+            Return True;
+        EndBody.
+        """
+        expect = 'A1\ndasd\nC3\nD4\nE5\n'
+        self.assertTrue(TestCodeGen.test(input, expect, 581))
+    def test_case_83(self):
+        input = """
+        Var: x = 0.052;
+        Var: a[4] = {False, True, False, True}, b[5] = {"A1", "B2", "C3", "D4", "E5"};
+        Function: main
+        Parameter: x
+        Body:
+            Do
+                printStrLn(b[int_of_float(x)]);
+                x = x +. 1.;
+                If x >=. 4.052 Then
+                    Break;
+                EndIf.
+            While f(a[1]) || f(a[2]) EndDo.
+        EndBody.
+        Function: f
+        Parameter: k
+        Body:
+            b[1] = "dasd";
+            Return True;
+        EndBody.
+        """
+        expect = 'A1\ndasd\nC3\nD4\n'
+        self.assertTrue(TestCodeGen.test(input, expect, 582))
+    def test_case_84(self):
+        input = """
+        Function: main
+        Parameter: x
+        Body:
+            Var: str[2][3] = {{"00", "01", "02"}, {"10", "11", "12"}};
+            Var: i = 0;
+            Do
+                print(string_of_float(float_of_string(str[i \ 3][i % 3])));
+                i = i + 1;
+            While i < 6 EndDo.
+        EndBody.
+        """
+        expect = '0.01.02.010.011.012.0'
+        self.assertTrue(TestCodeGen.test(input, expect, 583))
+    def test_case_85(self):
+        input = """
+        Function: main
+        Parameter: x
+        Body:
+            Var: str[2][3] = {{"00", "01", "02"}, {"10", "11", "12"}};
+            Var: i = 0;
+            Do
+                print(string_of_int(int_of_string(str[i \ 3][i % 3])));
+                i = i + 1;
+            While i < 6 EndDo.
+        EndBody.
+        """
+        expect = '012101112'
+        self.assertTrue(TestCodeGen.test(input, expect, 584))
+    def test_case_86(self):
+        input = """
+        Function: main
+        Parameter: x
+        Body:
+            Var: str[2][3] = {{"true", "01", "02"}, {"10", "11", "12"}};
+            Var: i = 0;
+            Do
+                print(string_of_bool(bool_of_string(str[i \ 3][i % 3])));
+                i = i + 1;
+            While i < 6 EndDo.
+        EndBody.
+        """
+        expect = 'truefalsefalsefalsefalsefalse'
+        self.assertTrue(TestCodeGen.test(input, expect, 585))
+    def test_case_87(self):
+        input = """
+        Function: mul_mat
+        Parameter: x[2][4], y[4][3], result[2][3]
+        Body:
+            Var: i = 0, j = 0;
+            For (i = 0, i < 2, 1) Do
+                For (j = 0, j < 3, 1) Do
+                    Var: sum = 0;
+                    Var: k = 0;
+                    Do
+                        sum = sum + x[i][k] * y[k][j];
+                        k = k + 1;
+                    While k < 4 EndDo.
+                    result[i][j] = sum;
+                EndFor.
+            EndFor.
+        EndBody.
+        Function: main
+        Body:
+            Var: x[2][4] = {{2, 3, 5, 1}, {6, 2, 5, 2}};
+            Var: y[4][3] = {{623, 123, 312}, {132, 423, 123}, {243, 314, 643}, {363, 798, 432}};
+            Var: result[2][3] = {{0, 0, 0}, {0, 0, 0}};
+            Var: i = 0, j = 0;
+            mul_mat(x, y, result);
+            For (i = 0, i < 2, 1) Do
+                For(j = 0, j < 3, 1) Do
+                    print(string_of_int(result[i][j]));
+                EndFor.
+            EndFor.
+        EndBody.
+        """
+        expect = '322038834640594347506197'
+        self.assertTrue(TestCodeGen.test(input, expect, 586))
+    def test_case_88(self):
+        input = """
+        Function: pow
+        Parameter: x, y
+        Body:
+            Var: p = 1.;
+            Var: i = 0;
+            While i < y Do
+                p = p *. x;
+                i = i + 1;
+            EndWhile.
+            Return p;
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_float(pow(2.2, 0)));
+            print(string_of_float(pow(2.2, 1)));
+            print(string_of_float(pow(2.2, 2)));
+            print(string_of_float(pow(2.2, 3)));
+            print(string_of_float(pow(2.2, 4)));
+        EndBody.
+        """
+        expect = '1.02.24.8410.64800123.425602'
+        self.assertTrue(TestCodeGen.test(input, expect, 587))
+    def test_case_89(self):
+        input = """
+        Function: gcd
+        Parameter: x, y
+        Body:
+            If x * y == 0 Then
+                Return x + y;
+            EndIf.
+            While y != 0 Do
+                If x > y Then
+                    x = x - y;
+                Else
+                    y = y - x;
+                EndIf.
+            EndWhile.
+            Return x;
+        EndBody.
+
+        Function: main
+        Body:
+            print(string_of_int(gcd(10, 20)));
+            print(string_of_int(gcd(0, 22)));
+            print(string_of_int(gcd(10, 26)));
+            print(string_of_int(gcd(56, 42)));
+        EndBody.
+        """
+        expect = '1022214'
+        self.assertTrue(TestCodeGen.test(input, expect, 588))
+    def test_case_90(self):
+        input = """
+        Function: gcd
+        Parameter: x, y
+        Body:
+            If x * y == 0 Then
+                Return x + y;
+            EndIf.
+            While y != 0 Do
+                If x > y Then
+                    x = x - y;
+                Else
+                    y = y - x;
+                EndIf.
+            EndWhile.
+            Return x;
+        EndBody.
+        Function: lcm
+        Parameter: x, y
+        Body:
+            Return x * y \ gcd(x, y);
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(lcm(10, 20)));
+            print(string_of_int(lcm(0, 22)));
+            print(string_of_int(lcm(10, 26)));
+            print(string_of_int(lcm(56, 42)));
+        EndBody.
+        """
+        expect = '200130168'
+        self.assertTrue(TestCodeGen.test(input, expect, 589))
+    def test_case_91(self):
+        input = """
+        Function: sum
+        Parameter: arr[5]
+        Body:
+           Var: rs = 0;
+           Var: i = 0;
+           While i < 5 Do
+            rs = rs - arr[i];
+            i = i + 1;
+           EndWhile.
+           Return rs;
+        EndBody.
+        Function: main
+        Body:
+            print(string_of_int(sum({1, 2, 3, 4, 5})));
+        EndBody.
+        """
+        expect = '-15'
+        self.assertTrue(TestCodeGen.test(input, expect, 590))
+    def test_case_92(self):
+        input = """
+        Function: sum
+        Parameter: arr[5]
+        Body:
+           Var: rs = 0;
+           Var: i = 0;
+           While i < 5 Do
+            rs = rs - arr[i];
+            i = i + 1;
+           EndWhile.
+           Return rs;
+        EndBody.
+        Function: main
+        Body:
+            Var: arr[5] = {0, 0, 0, 0, 0};
+            arr = {6, 2, 3, 4, 5};
+            print(string_of_int(sum(arr)));
+        EndBody.
+        """
+        expect = '-20'
+        self.assertTrue(TestCodeGen.test(input, expect, 591))
+    def test_case_93(self):
+        input = """
+        Var: arr[4] = {1111, 2222, 3333, 4444};
+        Var: i = 7777;
+        Function: f
+        Body:
+            print(string_of_int(i));
+            i = 5555;
+            Return arr;
+        EndBody.
+        Function: main
+        Body:
+            f()[1] = i;
+            print(string_of_int(arr[1]));
+        EndBody.
+        """
+        expect = '77775555'
+        self.assertTrue(TestCodeGen.test(input, expect, 592))
+    def test_case_94(self):
+        input = """
+        Var: arr[4] = {1111, 2222, 3333, 4444};
+        Var: i = 7777;
+        Function: f
+        Body:
+            print(string_of_int(i));
+            i = 5555;
+            Return arr;
+        EndBody.
+        Function: main
+        Body:
+            f()[1] = i;
+            print(string_of_int(arr[1]));
+        EndBody.
+        """
+        expect = '77775555'
+        self.assertTrue(TestCodeGen.test(input, expect, 593))
+    def test_case_95(self):
+        input = """
+        Var: arr[4] = {1111, 2222, 3333, 4444};
+        Var: i = 7777;
+        Function: f
+        Body:
+            print(string_of_int(i));
+            i = 5555;
+            Return i;
+        EndBody.
+        Function: main
+        Body:
+            i = f();
+            print(string_of_int(i));
+        EndBody.
+        """
+        expect = '77775555'
+        self.assertTrue(TestCodeGen.test(input, expect, 594))
+    def test_case_96(self):
+        input = """
+        Var: i = 10;
+        Var: f = 22.22;
+        Var: y = True, z = False;
+        Function: main
+        Body:
+            print(string_of_int(---------------i));
+            print(string_of_int(--------------i));
+            print(string_of_float(-.-.-.-.-.-.-.f));
+            print(string_of_float(-.-.-.-.-.-.-.-.f));
+            print(string_of_bool(!!!!!y));
+            print(string_of_bool(!!!!!!y));
+            print(string_of_bool(!!!!!!z));
+            print(string_of_bool(!!!!!!!z));
+        EndBody.
+        """
+        expect = '-1010-22.2222.22falsetruefalsetrue'
+        self.assertTrue(TestCodeGen.test(input, expect, 595))
+    def test_case_96(self):
+        input = """
+        Var: i = 10;
+        Var: f = 22.22;
+        Var: y = True, z = False;
+        Function: main
+        Body:
+            print(string_of_int(---------------i));
+            print(string_of_int(--------------i));
+            print(string_of_float(-.-.-.-.-.-.-.f));
+            print(string_of_float(-.-.-.-.-.-.-.-.f));
+            print(string_of_bool(!!!!!y));
+            print(string_of_bool(!!!!!!y));
+            print(string_of_bool(!!!!!!z));
+            print(string_of_bool(!!!!!!!z));
+        EndBody.
+        """
+        expect = '-1010-22.2222.22falsetruefalsetrue'
+        self.assertTrue(TestCodeGen.test(input, expect, 595))
+    def test_case_97(self):
+        input = """
+        Function: cout
+        Parameter: arr[5]
+        Body:
+            Var: i = 0;
+            Do
+                print(arr[i]);
+                i = i + 1;
+            While i < 5 EndDo.
+        EndBody.
+        Function: main
+        Body:
+            cout({"AE", "YU", "QW", "OI", "PT"});
+        EndBody.
+        """
+        expect = 'AEYUQWOIPT'
+        self.assertTrue(TestCodeGen.test(input, expect, 596))
+    def test_case_98(self):
+        input = """
+        Function: cout
+        Parameter: arr[7]
+        Body:
+            Var: i = 0;
+            Do
+                print(string_of_float(arr[i]));
+                i = i + 1;
+            While i < 7 EndDo.
+        EndBody.
+        Function: main
+        Body:
+            cout({1.2, 3.5653, 23.12, 343.23, 43534.132, 876.42, 42e2});
+        EndBody.
+        """
+        expect = '1.23.565323.12343.2343534.133876.424200.0'
+        self.assertTrue(TestCodeGen.test(input, expect, 597))
+    def test_case_99(self):
+        input = """
+        Var: x = 1;
+        Function: main
+        Parameter: args
+        Body:
+            Var: x = 3;
+            print(string_of_int(x));
+            x = 2 + x;
+            print(string_of_int(x));
+            x = foo(2);
+            print(string_of_int(x));
+            x = foo(3) + 1;
+            print(string_of_int(x));
+            Return;
+        EndBody.
+        Function: foo
+        Parameter: y
+        Body: 
+            x = x + 1;
+            Return 5;
+        EndBody.            
+        """
+        expect = '3556'
+        self.assertTrue(TestCodeGen.test(input, expect, 598))
+    def test_case_100(self):
+        input = """
+        Var: x = 1, a[3] = {10, 100, 100}, b[5] = {4, 6, 9, 8, 10};
+        Function: main
+        Parameter: x
+        Body:
+            a[0] = test() * b[2];
+            For (x = 0, x < 3, 1) Do
+                print(string_of_int(a[x]));
+            EndFor.
+        EndBody.
+        Function: f
+        Parameter: z, t
+        Body:
+            a[1] = 750;
+            Return a;
+        EndBody.
+        Function: test
+        Body:
+            Return f(2, 5)[x];
+        EndBody.
+        """
+        expect = '6750750100'
+        self.assertTrue(TestCodeGen.test(input, expect, 599))
+    def test_case_101(self):
+        input = """
+        Var: a = 0.e2, b = False, arr[2][2] = {{"Subject", "Mandatory"}, {"PPL", "Harmonic mean"}};
+        Function: f
+        Body:
+            Return arr;
+        EndBody.
+        Function: main
+        Parameter: x, y
+        Body:
+            f()[1][0] = "a * 2";
+            arr[0][1] = "PPL!!! hard!!!";
+            print(arr[0][0]);
+            print(arr[0][1]);
+            print(arr[1][0]);
+            print(arr[1][1]);
+        EndBody.
+        """
+        expect = 'SubjectPPL!!! hard!!!a * 2Harmonic mean'
+        self.assertTrue(TestCodeGen.test(input, expect, 600))
+    def test_case_102(self):
+        input = """
+        Function: foo
+        Parameter: x[10]
+        Body:
+            Var: i = 1;
+            While x[i] <= x[0] Do
+                i = i + 1;
+            EndWhile.
+            Return i;
+        EndBody.
+        Function: main
+        Parameter: x, y
+        Body:
+            print(string_of_int(foo({100, 42, 4, 2, 63, 42, 53, 22, 731, 431})));
+        EndBody.
+        """
+        expect = '8'
+        self.assertTrue(TestCodeGen.test(input, expect, 601))

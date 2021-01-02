@@ -1,0 +1,20 @@
+
+            Var: x = 1;
+            Function: main
+            Parameter: args
+            Body:
+                Var: x = 3;
+                x = 2 + x;
+                x = foo(2);
+                x = foo(3) + 1;
+                print(string_of_int(x));
+                Return;
+            EndBody.
+            
+            Function: foo
+            Parameter: x
+            Body: 
+                x = x + 1;
+                Return 5;
+            EndBody.
+        

@@ -445,14 +445,13 @@ class Emitter():
                 result.append(self.emitIFTRUE(true_label, frame))
                 v = 0 if op == '>' else 1
             elif op in ['<', '>=']:
-                # frame.pop()
+                frame.pop()
                 result.append(self.jvm.emitIFGE(true_label))
                 v = 1 if op == '<' else 0
             elif op == '=/=':
-                # frame.pop()
+                frame.pop()
                 result.append(self.jvm.emitIFNE(true_label))
                 v = 0
-            frame.pop()
             result.append(self.emitPUSHICONST(v, frame))
             result.append(self.emitGOTO(false_label, frame))
             result.append(self.emitLABEL(true_label, frame))

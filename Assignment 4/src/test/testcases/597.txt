@@ -1,0 +1,15 @@
+
+        Function: cout
+        Parameter: arr[7]
+        Body:
+            Var: i = 0;
+            Do
+                print(string_of_float(arr[i]));
+                i = i + 1;
+            While i < 7 EndDo.
+        EndBody.
+        Function: main
+        Body:
+            cout({1.2, 3.5653, 23.12, 343.23, 43534.132, 876.42, 42e2});
+        EndBody.
+        

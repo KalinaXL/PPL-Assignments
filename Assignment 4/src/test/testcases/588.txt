@@ -1,0 +1,25 @@
+
+        Function: gcd
+        Parameter: x, y
+        Body:
+            If x * y == 0 Then
+                Return x + y;
+            EndIf.
+            While y != 0 Do
+                If x > y Then
+                    x = x - y;
+                Else
+                    y = y - x;
+                EndIf.
+            EndWhile.
+            Return x;
+        EndBody.
+
+        Function: main
+        Body:
+            print(string_of_int(gcd(10, 20)));
+            print(string_of_int(gcd(0, 22)));
+            print(string_of_int(gcd(10, 26)));
+            print(string_of_int(gcd(56, 42)));
+        EndBody.
+        

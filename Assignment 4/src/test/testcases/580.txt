@@ -1,0 +1,22 @@
+
+        Var: x = 0.052;
+        Var: a[4] = {False, True, False, True}, b[5] = {"A1", "B2", "C3", "D4", "E5"};
+        Function: main
+        Parameter: x
+        Body:
+            Do
+                printStrLn(b[int_of_float(x)]);
+                x = x +. 1.;
+                If x =/= 4.052 Then
+                    Continue;
+                EndIf.
+                Break;
+            While f(a[1]) || f(a[2]) EndDo.
+        EndBody.
+        Function: f
+        Parameter: k
+        Body:
+            b[1] = "dasd";
+            Return True;
+        EndBody.
+        

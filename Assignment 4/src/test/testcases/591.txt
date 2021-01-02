@@ -1,0 +1,19 @@
+
+        Function: sum
+        Parameter: arr[5]
+        Body:
+           Var: rs = 0;
+           Var: i = 0;
+           While i < 5 Do
+            rs = rs - arr[i];
+            i = i + 1;
+           EndWhile.
+           Return rs;
+        EndBody.
+        Function: main
+        Body:
+            Var: arr[5] = {0, 0, 0, 0, 0};
+            arr = {6, 2, 3, 4, 5};
+            print(string_of_int(sum(arr)));
+        EndBody.
+        
